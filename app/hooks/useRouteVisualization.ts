@@ -3,8 +3,8 @@ import L from 'leaflet';
 
 interface UseRouteVisualizationProps {
   mapRef: React.MutableRefObject<L.Map | null>;
-  route: any[] | null;
-  waypoints: any[] | null;
+  route: [number, number][] | null;
+  waypoints: [number, number][] | null;
 }
 
 export const useRouteVisualization = ({ mapRef, route, waypoints }: UseRouteVisualizationProps) => {

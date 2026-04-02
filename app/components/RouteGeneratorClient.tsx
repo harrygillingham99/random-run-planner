@@ -3,8 +3,11 @@
 import { useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { generateRoute, calculateStats } from '../lib/routeUtils';
+import { useGeolocation } from '../hooks/useGeolocation';
+import { useRouteForm } from '../hooks/useRouteForm';
 import Sidebar from './Sidebar';
 import FloatingStats from './FloatingStats';
+import '../styles/RouteGeneratorClient.scss';
 
 const Map = dynamic(() => import('./Map'), { ssr: false });
 
@@ -16,10 +19,18 @@ interface Stats {
 }
 
 export default function RouteGeneratorClient() {
-  const [lat, setLat] = useState<number>(50.9097);
-  const [lng, setLng] = useState<number>(-1.4044);
-  const [distance, setDistance] = useState<number>(5);
-  const [style, setStyle] = useState<'loop' | 'outback'>('loop');
+  const {
+    lat,
+    lng,
+    distance,
+    style,
+    setDistance,
+    setStyle,
+    setCoordinates,
+    updateLat,
+    updateLng,
+    hasValidCoordinates,
+  } = useRouteForm();
   const [status, setStatus] = useState<{ message: string; type: '' | 'ok' | 'err' }>(
     { message: 'Set a start point to begin', type: '' }
   );
@@ -35,17 +46,15 @@ export default function RouteGeneratorClient() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleMapClick = useCallback((clickLat: number, clickLng: number) => {
-    setLat(clickLat);
-    setLng(clickLng);
+    setCoordinates(clickLat, clickLng);
     setStatus({ message: 'Start point set — click Generate run!', type: 'ok' });
     setSidebarOpen(false);
-  }, []);
+  }, [setCoordinates]);
 
   const handleLocationFound = useCallback((locLat: number, locLng: number) => {
-    setLat(locLat);
-    setLng(locLng);
+    setCoordinates(locLat, locLng);
     setStatus({ message: 'Your location found! Ready to generate routes.', type: 'ok' });
-  }, []);
+  }, [setCoordinates]);
 
   const handleLocationError = useCallback((errorMessage: string) => {
     // Gracefully fall back to default location without showing error
@@ -54,44 +63,29 @@ export default function RouteGeneratorClient() {
     setStatus({ message: 'Ready to generate routes. Click the map to set your location.', type: '' });
   }, []);
 
-  const checkCoordinates = (newLat: number, newLng: number) => {
-    if (!isNaN(newLat) && !isNaN(newLng)) {
-      setStatus({ message: 'Start point set — click Generate run!', type: 'ok' });
-    }
-  };
+  const { requestGeolocation } = useGeolocation(
+    (result) => {
+      setCoordinates(result.latitude, result.longitude);
+      setStatus({ message: 'Location found! Click Generate run', type: 'ok' });
+    },
+    (error) => {
+      const errorMessage =
+        error.code === 0 ? 'Geolocation not supported in this browser' : error.message;
+      setStatus({
+        message: `${errorMessage} — enter coordinates or click the map`,
+        type: 'err',
+      });
+    },
+    { timeout: 8000, maximumAge: 60000 }
+  );
 
-  const handleGeoLocation = () => {
+  const handleGeoLocation = useCallback(() => {
     setStatus({ message: 'Requesting your location...', type: '' });
-    if (!navigator.geolocation) {
-      setStatus({ message: 'Geolocation not supported in this browser', type: 'err' });
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const newLat = pos.coords.latitude;
-        const newLng = pos.coords.longitude;
-        setLat(newLat);
-        setLng(newLng);
-        setStatus({ message: 'Location found! Click Generate run', type: 'ok' });
-      },
-      (err) => {
-        const msgs: { [key: number]: string } = {
-          1: 'Location permission denied',
-          2: 'Position unavailable',
-          3: 'Request timed out',
-        };
-        setStatus({
-          message: (msgs[err.code] || 'Location failed') + ' — enter coordinates or click the map',
-          type: 'err',
-        });
-      },
-      { timeout: 8000, maximumAge: 60000 }
-    );
-  };
+    requestGeolocation();
+  }, [requestGeolocation]);
 
   const handleGenerateRoute = async () => {
-    if (isNaN(lat) || isNaN(lng)) {
+    if (!hasValidCoordinates) {
       setStatus({ message: 'Please set a start point first', type: 'err' });
       return;
     }
@@ -145,12 +139,16 @@ export default function RouteGeneratorClient() {
         lat={lat}
         lng={lng}
         onLatChange={(value) => {
-          setLat(value);
-          checkCoordinates(value, lng);
+          const isValid = updateLat(value);
+          if (isValid) {
+            setStatus({ message: 'Start point set — click Generate run!', type: 'ok' });
+          }
         }}
         onLngChange={(value) => {
-          setLng(value);
-          checkCoordinates(lat, value);
+          const isValid = updateLng(value);
+          if (isValid) {
+            setStatus({ message: 'Start point set — click Generate run!', type: 'ok' });
+          }
         }}
         onGeoLocation={handleGeoLocation}
         distance={distance}

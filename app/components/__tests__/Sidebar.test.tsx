@@ -113,10 +113,7 @@ describe('Sidebar Component', () => {
   it('should render distance input with correct value', () => {
     render(<Sidebar {...defaultProps} distance={5} />);
 
-    const distanceInputs = screen.getAllByRole('spinbutton');
-    const distanceInput = distanceInputs.find(
-      (input) => (input as HTMLInputElement).min === '1' && (input as HTMLInputElement).max === '30'
-    ) as HTMLInputElement;
+    const distanceInput = screen.getByDisplayValue('5') as HTMLInputElement;
 
     expect(distanceInput).toBeInTheDocument();
     expect(distanceInput.value).toBe('5');
@@ -126,16 +123,10 @@ describe('Sidebar Component', () => {
     const onDistanceChange = jest.fn();
     render(<Sidebar {...defaultProps} onDistanceChange={onDistanceChange} />);
 
-    const distanceInputs = screen.getAllByRole('spinbutton');
-    const distanceInput = distanceInputs.find(
-      (input) => (input as HTMLInputElement).min === '1' && (input as HTMLInputElement).max === '30'
-    ) as HTMLInputElement;
+    const distanceInput = screen.getByDisplayValue('5') as HTMLInputElement;
 
-    if (distanceInput) {
-      // Use fireEvent for direct input changes
-      fireEvent.change(distanceInput, { target: { value: '10' } });
-      expect(onDistanceChange).toHaveBeenCalledWith(10);
-    }
+    fireEvent.change(distanceInput, { target: { value: '10' } });
+    expect(onDistanceChange).toHaveBeenCalledWith(10);
   });
 
   it('should render style select with correct value', () => {

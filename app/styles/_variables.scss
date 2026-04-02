@@ -1,0 +1,49 @@
+@use 'sass:map';
+
+// ============================================================================
+// SHARED VARIABLES, MAPS & HELPER FUNCTIONS
+// ============================================================================
+
+$colors: (
+  green: #1D9E75,
+  green-light: #E1F5EE,
+  green-dark: #0F6E56,
+  blue: #378ADD,
+  bg: #f7f6f2,
+  surface: #ffffff,
+  border: rgba(0, 0, 0, 0.1),
+  text: #1a1a18,
+  muted: #6b6b67,
+  error: #c0392b,
+  error-light: #fdf0ef,
+);
+
+$typography: (
+  sans: 'DM Sans',
+  mono: 'DM Mono',
+);
+
+$spacing: (
+  xs: 5px,
+  sm: 8px,
+  md: 12px,
+  lg: 1rem,
+  xl: 1.25rem,
+  xxl: 1.5rem,
+);
+
+$radius: 12px;
+$header-height: 61px;
+$mobile-breakpoint: 640px;
+
+@function color($key) {
+  @return map.get($colors, $key);
+}
+
+@function space($key) {
+  @return map.get($spacing, $key);
+}
+
+@function font($key) {
+  @return map.get($typography, $key);
+}

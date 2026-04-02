@@ -132,10 +132,7 @@ describe('RouteGeneratorClient Component', () => {
       render(<RouteGeneratorClient />);
 
       // Distance input should be present
-      const distanceInputs = screen.getAllByRole('spinbutton');
-      const distanceInput = distanceInputs.find((input) =>
-        (input as HTMLInputElement).min === '1' && (input as HTMLInputElement).max === '30'
-      );
+      const distanceInput = screen.getByDisplayValue('5');
 
       expect(distanceInput).toBeInTheDocument();
     });

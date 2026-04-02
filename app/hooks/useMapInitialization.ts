@@ -1,14 +1,15 @@
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import L from 'leaflet';
+import { useGeolocation } from './useGeolocation';
 
 interface UseMapInitializationProps {
   initialLat: number;
   initialLng: number;
   onMapClick: (lat: number, lng: number) => void;
   onHintHide: () => void;
-  onMapReady: (map: L.Map) => void;
-  onGeolocationRequest: () => void;
-  hasAttemptedGeolocation: boolean;
+  onMapReady?: (map: L.Map) => void;
+  onLocationFound?: (lat: number, lng: number) => void;
+  onLocationError?: (error: string) => void;
 }
 
 export const useMapInitialization = ({
@@ -17,11 +18,28 @@ export const useMapInitialization = ({
   onMapClick,
   onHintHide,
   onMapReady,
-  onGeolocationRequest,
-  hasAttemptedGeolocation,
+  onLocationFound,
+  onLocationError,
 }: UseMapInitializationProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
+  const hasRequestedGeolocationRef = useRef(false);
+
+  const handleLocationFound = useCallback(
+    (result: { latitude: number; longitude: number }) => {
+      onLocationFound?.(result.latitude, result.longitude);
+    },
+    [onLocationFound]
+  );
+
+  const handleLocationError = useCallback(
+    (error: { message: string }) => {
+      onLocationError?.(error.message);
+    },
+    [onLocationError]
+  );
+
+  const { requestGeolocation } = useGeolocation(handleLocationFound, handleLocationError);
 
   // Initialize map only once
   useEffect(() => {
@@ -33,13 +51,30 @@ export const useMapInitialization = ({
       maxZoom: 19,
     }).addTo(map);
 
-    map.on('click', (e) => {
+    const handleMapClick = (e: L.LeafletMouseEvent) => {
       onMapClick(e.latlng.lat, e.latlng.lng);
       onHintHide();
-    });
+    };
+
+    map.on('click', handleMapClick);
 
     mapRef.current = map;
-    onMapReady(map);
+    onMapReady?.(map);
+
+    if (!hasRequestedGeolocationRef.current) {
+      hasRequestedGeolocationRef.current = true;
+      requestGeolocation();
+    }
+
+    return () => {
+      if (typeof map.off === 'function') {
+        map.off('click', handleMapClick);
+      }
+      if (typeof map.remove === 'function') {
+        map.remove();
+      }
+      mapRef.current = null;
+    };
   }, []);
 
   return { mapContainer, mapRef };

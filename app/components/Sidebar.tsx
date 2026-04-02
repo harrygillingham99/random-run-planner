@@ -1,5 +1,7 @@
 'use client';
 
+import '../styles/Sidebar.scss';
+
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
@@ -41,17 +43,42 @@ export default function Sidebar({
   stats,
 }: SidebarProps) {
   const handleLatChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseFloat(e.target.value);
-    if (!isNaN(value) && value >= -90 && value <= 90) {
+    const normalized = e.target.value.replace(',', '.').trim();
+    if (!normalized) {
+      return;
+    }
+
+    const value = Number(normalized);
+    if (!Number.isNaN(value) && value >= -90 && value <= 90) {
       onLatChange(value);
     }
   };
 
   const handleLngChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseFloat(e.target.value);
-    if (!isNaN(value) && value >= -180 && value <= 180) {
+    const normalized = e.target.value.replace(',', '.').trim();
+    if (!normalized) {
+      return;
+    }
+
+    const value = Number(normalized);
+    if (!Number.isNaN(value) && value >= -180 && value <= 180) {
       onLngChange(value);
     }
+  };
+
+  const handleDistanceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const normalized = e.target.value.replace(',', '.').trim();
+    if (!normalized) {
+      return;
+    }
+
+    const value = Number(normalized);
+    if (Number.isNaN(value)) {
+      return;
+    }
+
+    const clampedValue = Math.min(30, Math.max(1, value));
+    onDistanceChange(clampedValue);
   };
 
   return (
@@ -78,7 +105,8 @@ export default function Sidebar({
         <div className="field">
           <label>Latitude</label>
           <input
-            type="number"
+            type="text"
+            inputMode="decimal"
             value={lat}
             onChange={handleLatChange}
             step="0.00001"
@@ -88,7 +116,8 @@ export default function Sidebar({
         <div className="field">
           <label>Longitude</label>
           <input
-            type="number"
+            type="text"
+            inputMode="decimal"
             value={lng}
             onChange={handleLngChange}
             step="0.00001"
@@ -110,11 +139,11 @@ export default function Sidebar({
           <div className="field">
             <label>Distance (km)</label>
             <input
-              type="number"
+              type="text"
+              inputMode="decimal"
               value={distance}
-              onChange={(e) => onDistanceChange(parseFloat(e.target.value) || 5)}
-              min="1"
-              max="30"
+              onChange={handleDistanceChange}
+              placeholder="5"
               step="0.5"
             />
           </div>

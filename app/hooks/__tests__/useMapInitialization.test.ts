@@ -22,7 +22,8 @@ describe('useMapInitialization', () => {
   const mockOnMapClick = jest.fn();
   const mockOnHintHide = jest.fn();
   const mockOnMapReady = jest.fn();
-  const mockOnGeolocationRequest = jest.fn();
+  const mockOnLocationFound = jest.fn();
+  const mockOnLocationError = jest.fn();
 
   const defaultProps = {
     initialLat: 50.9097,
@@ -30,8 +31,8 @@ describe('useMapInitialization', () => {
     onMapClick: mockOnMapClick,
     onHintHide: mockOnHintHide,
     onMapReady: mockOnMapReady,
-    onGeolocationRequest: mockOnGeolocationRequest,
-    hasAttemptedGeolocation: false,
+    onLocationFound: mockOnLocationFound,
+    onLocationError: mockOnLocationError,
   };
 
   beforeEach(() => {
@@ -46,15 +47,14 @@ describe('useMapInitialization', () => {
   });
 
   it('should trigger geolocation setup when not attempted', () => {
-    // Verify that when hasAttemptedGeolocation is false,
-    // the hook is set up to call onGeolocationRequest
+    // Verify geolocation support is wired through hook setup.
     const { result } = renderHook(() => useMapInitialization(defaultProps));
 
     // The hook should be properly initialized
     expect(result.current.mapContainer).toBeDefined();
     expect(result.current.mapRef).toBeDefined();
     
-    // In a real environment with a DOM container, onGeolocationRequest would be called
+    // In a real environment with a DOM container, geolocation would be requested once
     // This test just verifies the hook structure is correct
   });
 
@@ -85,8 +85,8 @@ describe('useMapInitialization', () => {
       onMapClick: jest.fn(),
       onHintHide: jest.fn(),
       onMapReady: jest.fn(),
-      onGeolocationRequest: jest.fn(),
-      hasAttemptedGeolocation: true,
+      onLocationFound: jest.fn(),
+      onLocationError: jest.fn(),
     };
 
     const { result } = renderHook(() => useMapInitialization(props));
@@ -110,7 +110,6 @@ describe('useMapInitialization', () => {
           ...defaultProps,
           initialLat: lat,
           initialLng: lng,
-          hasAttemptedGeolocation: true,
         })
       );
 

@@ -1,0 +1,239 @@
+@use './variables' as *;
+
+.sidebar {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: space(xl);
+  display: flex;
+  flex-direction: column;
+  gap: space(lg);
+  overflow-y: auto;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.sidebar-close {
+  display: none;
+}
+
+// Form elements scoped to sidebar context
+.section-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: space(sm);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: space(xs);
+
+  label {
+    font-size: 13px;
+    color: var(--muted);
+  }
+}
+
+.sidebar {
+  input[type='number'],
+  input[type='text'],
+  select {
+    width: 100%;
+    padding: space(sm) space(md);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: #{font(mono)}, monospace;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s ease, background-color 0.3s ease, color 0.3s ease;
+
+    &:focus {
+      border-color: var(--green);
+    }
+  }
+
+  button {
+    width: 100%;
+    padding: space(md) space(lg);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: #{font(sans)}, sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+
+    &:hover {
+      background: var(--bg);
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
+  }
+}
+
+.coord-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: space(sm);
+}
+
+// Dividers & separators
+.divider {
+  display: flex;
+  align-items: center;
+  gap: space(sm);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+}
+
+.sep {
+  height: 1px;
+  background: var(--border);
+}
+
+// Primary button variant
+button.primary {
+  background: var(--green);
+  color: white;
+  border-color: var(--green);
+
+  &:hover {
+    background: var(--green-dark);
+    border-color: var(--green-dark);
+  }
+}
+
+// Status message
+.status {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+  min-height: 36px;
+  padding: space(sm) space(md);
+  background: var(--bg);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+
+  &.err {
+    color: color(error);
+    background: var(--error-light);
+    border-color: rgba(192, 57, 43, 0.2);
+  }
+
+  &.ok {
+    color: var(--text);
+    background: var(--green-light);
+    border-color: rgba(29, 158, 117, 0.2);
+  }
+}
+
+[data-theme='dark'] .status.ok {
+  color: #a3ffd8;
+}
+
+// Statistics
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: space(sm);
+}
+
+.stat {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: space(md);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+
+  &.full {
+    grid-column: span 2;
+  }
+}
+
+.stat-label {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: space(xs);
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: 500;
+  font-family: #{font(mono)}, monospace;
+  color: var(--text);
+}
+
+// Sidebar responsive
+@media (max-width: $mobile-breakpoint) {
+  .sidebar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-height: 50vh;
+    border-right: none;
+    border-top: 1px solid var(--border);
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    z-index: 999;
+    overflow-y: auto;
+    pointer-events: none;
+    padding: space(lg) space(xl);
+
+    &.open {
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+  }
+
+  .sidebar-close {
+    display: block;
+    align-self: flex-end;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: var(--muted);
+    transition: color 0.2s ease;
+    margin-bottom: space(md);
+
+    &:hover {
+      color: var(--text);
+    }
+
+    &:active {
+      transform: scale(0.9);
+    }
+  }
+}

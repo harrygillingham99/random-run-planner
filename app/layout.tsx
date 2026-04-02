@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.scss";
-import DarkModeToggle from "./components/DarkModeToggle";
+import "./styles/Header.scss";
+import Navbar from "./components/Navbar";
 
 export const metadata: Metadata = {
   title: "Run Route Planner",
@@ -23,24 +24,7 @@ export default function RootLayout({
         />
       </head>
       <body suppressHydrationWarning>
-        <header>
-          <div className="logo-mark">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="white"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M13 4v4l3 3-3 3v4" />
-              <path d="M6 8l3 4-3 4" />
-            </svg>
-          </div>
-          <h1>Run Route Planner</h1>
-          <span></span>
-          <DarkModeToggle />
-        </header>
+        <Navbar />
         {children}
       </body>
     </html>

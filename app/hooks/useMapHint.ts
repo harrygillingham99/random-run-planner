@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 export const useMapHint = () => {
   const [showHint, setShowHint] = useState(true);
 
-  const hideHint = () => {
+  const hideHint = useCallback(() => {
     setShowHint(false);
-  };
+  }, []);
 
   return { showHint, hideHint };
 };

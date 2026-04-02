@@ -1,5 +1,7 @@
 'use client';
 
+import '../styles/FloatingStats.scss';
+
 interface FloatingStatsProps {
   distance: string;
   time: string;

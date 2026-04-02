@@ -1,38 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useDarkMode } from '../hooks/useDarkMode';
 import '../styles/DarkModeToggle.scss';
 
 export default function DarkModeToggle() {
-  const [isDark, setIsDark] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    // Check localStorage for saved preference
-    const saved = localStorage.getItem('theme');
-    // Check system preference
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const shouldBeDark = saved === 'dark' || (!saved && prefersDark);
-    setIsDark(shouldBeDark);
-    applyTheme(shouldBeDark);
-  }, []);
-
-  const applyTheme = (dark: boolean) => {
-    if (dark) {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.removeAttribute('data-theme');
-      localStorage.setItem('theme', 'light');
-    }
-  };
-
-  const toggleTheme = () => {
-    const newValue = !isDark;
-    setIsDark(newValue);
-    applyTheme(newValue);
-  };
+  const { isDark, mounted, toggleTheme } = useDarkMode();
 
   if (!mounted) {
     return null;

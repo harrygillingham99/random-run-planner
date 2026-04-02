@@ -1,6 +1,86 @@
-import { offset, calculateStats } from '@/app/lib/routeUtils';
+import { offset, calculateStats, osrmRoute } from '@/app/lib/routeUtils';
 
 describe('routeUtils', () => {
+  describe('osrmRoute', () => {
+    const originalFetch = global.fetch;
+
+    afterEach(() => {
+      global.fetch = originalFetch;
+      jest.clearAllMocks();
+    });
+
+    it('should return parsed route data on successful OSRM response', async () => {
+      global.fetch = jest.fn().mockResolvedValue({
+        json: async () => ({
+          code: 'Ok',
+          routes: [
+            {
+              distance: 1234,
+              geometry: {
+                coordinates: [
+                  [-1.4044, 50.9097],
+                  [-1.3, 50.95],
+                ],
+              },
+            },
+          ],
+        }),
+      } as Response);
+
+      const result = await osrmRoute([
+        [50.9097, -1.4044],
+        [50.95, -1.3],
+      ]);
+
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({
+        distance: 1234,
+        path: [
+          [50.9097, -1.4044],
+          [50.95, -1.3],
+        ],
+      });
+    });
+
+    it('should return null when OSRM response code is not Ok', async () => {
+      global.fetch = jest.fn().mockResolvedValue({
+        json: async () => ({ code: 'NoRoute', routes: [] }),
+      } as Response);
+
+      const result = await osrmRoute([[50.9097, -1.4044]]);
+
+      expect(result).toBeNull();
+    });
+
+    it('should return null when route array is empty', async () => {
+      global.fetch = jest.fn().mockResolvedValue({
+        json: async () => ({ code: 'Ok', routes: [] }),
+      } as Response);
+
+      const result = await osrmRoute([[50.9097, -1.4044]]);
+
+      expect(result).toBeNull();
+    });
+
+    it('should return null when response payload is malformed', async () => {
+      global.fetch = jest.fn().mockResolvedValue({
+        json: async () => ({ code: 'Ok' }),
+      } as Response);
+
+      const result = await osrmRoute([[50.9097, -1.4044]]);
+
+      expect(result).toBeNull();
+    });
+
+    it('should return null when fetch fails', async () => {
+      global.fetch = jest.fn().mockRejectedValue(new Error('Network error'));
+
+      const result = await osrmRoute([[50.9097, -1.4044]]);
+
+      expect(result).toBeNull();
+    });
+  });
+
   describe('offset', () => {
     it('should calculate offset coordinates correctly', () => {
       const [lat, lng] = offset(50.9097, -1.4044, 1, 0);
