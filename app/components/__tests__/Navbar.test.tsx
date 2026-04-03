@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import Navbar from 'components/Navbar';
+import styles from '../../styles/Navbar.module.scss';
 
 jest.mock('components/DarkModeToggle', () => {
   return function MockDarkModeToggle() {
@@ -24,7 +25,7 @@ describe('Navbar Component', () => {
   it('should render brand logo svg', () => {
     const { container } = render(<Navbar />);
 
-    const svg = container.querySelector('header .logo-mark svg');
+    const svg = container.querySelector(`header .${styles.logoMark} svg`);
     expect(svg).toBeInTheDocument();
   });
 });

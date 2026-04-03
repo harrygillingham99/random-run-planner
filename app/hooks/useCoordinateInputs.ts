@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 
 const parseDecimalInput = (raw: string): number | null => {
-  const normalized = raw.replace(',', '.').trim();
-  if (!normalized) return null;
-  const value = Number(normalized);
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+  if (!/^[+-]?(?:\d+(?:[.,]\d+)?|[.,]\d+)$/.test(trimmed)) return null;
+  const value = Number(trimmed.replace(',', '.'));
   return Number.isNaN(value) ? null : value;
 };
 
