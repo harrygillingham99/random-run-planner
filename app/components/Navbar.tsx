@@ -1,9 +1,10 @@
 import DarkModeToggle from './DarkModeToggle';
+import styles from 'styles/Navbar.module.scss';
 
 export default function Navbar() {
   return (
-    <header>
-      <div className="logo-mark">
+    <header className={styles.header}>
+      <div className={styles.logoMark}>
         <svg
           viewBox="0 0 24 24"
           fill="none"

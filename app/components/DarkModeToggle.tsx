@@ -1,7 +1,7 @@
 'use client';
 
 import { useDarkMode } from '../hooks/useDarkMode';
-import '../styles/DarkModeToggle.scss';
+import styles from 'styles/DarkModeToggle.module.scss';
 
 export default function DarkModeToggle() {
   const { isDark, mounted, toggleTheme } = useDarkMode();
@@ -12,7 +12,7 @@ export default function DarkModeToggle() {
 
   return (
     <button
-      className="dark-mode-toggle"
+      className={styles.darkModeToggle}
       onClick={toggleTheme}
       aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
       title={isDark ? 'Light mode' : 'Dark mode'}

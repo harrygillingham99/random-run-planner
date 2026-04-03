@@ -22,7 +22,8 @@
       "components/*": ["./app/components/*"],
       "hooks/*": ["./app/hooks/*"],
       "context/*": ["./app/context/*"],
-      "lib/*": ["./app/lib/*"]
+      "lib/*": ["./app/lib/*"],
+      "styles/*": ["./app/styles/*"]
     }
   },
   "include": [

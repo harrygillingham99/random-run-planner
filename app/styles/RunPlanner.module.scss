@@ -7,7 +7,7 @@
   height: calc(100vh - #{$header-height});
 }
 
-.menu-backdrop {
+.menuBackdrop {
   display: none;
 }
 
@@ -15,11 +15,11 @@
   .layout {
     grid-template-columns: 1fr;
     grid-template-rows: 1fr;
-    height: 100%;
+    height: calc(100vh - #{$header-height});
     position: relative;
   }
 
-  .menu-backdrop {
+  .menuBackdrop {
     display: block;
     position: fixed;
     inset: 0;
@@ -27,7 +27,7 @@
     z-index: 997;
   }
 
-  .menu-toggle {
+  .menuToggle {
     position: fixed;
     bottom: 24px;
     right: 24px;
@@ -59,7 +59,7 @@
 }
 
 @media (min-width: #{$mobile-breakpoint + 1}) {
-  .menu-toggle {
+  .menuToggle {
     display: none !important;
   }
 }

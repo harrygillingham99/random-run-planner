@@ -1,7 +1,7 @@
 'use client';
 
 import { useRunPlanner } from '../context/RunPlannerContext';
-import '../styles/FloatingStats.scss';
+import styles from 'styles/FloatingStats.module.scss';
 
 export default function FloatingStats() {
   const { stats, routeData, sidebarOpen } = useRunPlanner();
@@ -14,14 +14,14 @@ export default function FloatingStats() {
   const { distance, time } = stats;
 
   return (
-    <div className="floating-stats">
-      <div className="float-stat">
-        <div className="float-stat-label">Distance</div>
-        <div className="float-stat-value">{distance}</div>
+    <div className={styles.floatingStats}>
+      <div className={styles.floatStat}>
+        <div className={styles.floatStatLabel}>Distance</div>
+        <div className={styles.floatStatValue}>{distance}</div>
       </div>
-      <div className="float-stat">
-        <div className="float-stat-label">Est. time</div>
-        <div className="float-stat-value">{time}</div>
+      <div className={styles.floatStat}>
+        <div className={styles.floatStatLabel}>Est. time</div>
+        <div className={styles.floatStatValue}>{time}</div>
       </div>
     </div>
   );

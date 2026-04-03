@@ -1,8 +1,11 @@
 <!-- BEGIN:nextjs-agent-rules -->
+
 # This is NOT the Next.js you know
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
+
 <!-- END:nextjs-agent-rules -->
+
 # Testing Guide for Run Route Planner Web
 
 ## Overview
@@ -53,10 +56,12 @@ app/
 Tests for pure utility functions without dependencies.
 
 **Key Functions Tested:**
+
 - `offset()` - Geographic coordinate calculations
 - `calculateStats()` - Route statistics formatting
 
 **Example:**
+
 ```typescript
 it('should calculate offset coordinates correctly', () => {
   const [lat, lng] = offset(50.9097, -1.4044, 1, 0);
@@ -65,6 +70,7 @@ it('should calculate offset coordinates correctly', () => {
 ```
 
 **Best Practices:**
+
 - Test edge cases (zero values, extremes, negative numbers)
 - Test multiple input scenarios
 - Use descriptive test names
@@ -74,11 +80,13 @@ it('should calculate offset coordinates correctly', () => {
 Tests for React components with mocked external libraries.
 
 **Key Aspects:**
+
 - Leaflet library is fully mocked to isolate component behavior
 - Tests verify props handling and rendering
 - Props validation against coordinate ranges
 
 **Mocking Pattern:**
+
 ```typescript
 jest.mock('leaflet', () => ({
   map: jest.fn(() => mockMap),
@@ -92,6 +100,7 @@ jest.mock('leaflet', () => ({
 Tests for the main page component with user interactions.
 
 **Key Features Tested:**
+
 - State management (coordinates, distance, style)
 - User input handling (latitude/longitude inputs)
 - Geolocation API integration
@@ -99,17 +108,18 @@ Tests for the main page component with user interactions.
 - Error handling
 
 **Example:**
+
 ```typescript
 it('should handle geolocation errors', async () => {
   const mockGetCurrentPosition = jest.fn((success, error) => {
     error({ code: 1 }); // Permission denied
   });
   global.navigator.geolocation.getCurrentPosition = mockGetCurrentPosition;
-  
+
   render(<Home />);
   const geoButton = screen.getByRole('button', { name: /Detect my location/i });
   await user.click(geoButton);
-  
+
   await waitFor(() => {
     expect(screen.getByText(/Location permission denied/i)).toBeInTheDocument();
   });
@@ -129,7 +139,10 @@ jest.mock('@/app/lib/routeUtils', () => ({
 // Use in tests
 (routeUtils.generateRoute as jest.Mock).mockResolvedValue({
   result: { path: [[50, -1]], distance: 5000 },
-  waypoints: [[50, -1], [50.1, -1.1]],
+  waypoints: [
+    [50, -1],
+    [50.1, -1.1],
+  ],
 });
 ```
 
@@ -138,11 +151,11 @@ jest.mock('@/app/lib/routeUtils', () => ({
 ```typescript
 it('should handle async route generation', async () => {
   (routeUtils.generateRoute as jest.Mock).mockResolvedValue({ ... });
-  
+
   render(<Home />);
   const generateButton = screen.getByRole('button', { name: /Generate run/i });
   await user.click(generateButton);
-  
+
   await waitFor(() => {
     expect(screen.getByText(/Route ready/i)).toBeInTheDocument();
   });
@@ -153,16 +166,16 @@ it('should handle async route generation', async () => {
 
 ```typescript
 // By role (preferred)
-screen.getByRole('button', { name: /Generate run/i })
+screen.getByRole('button', { name: /Generate run/i });
 
 // By placeholder
-screen.getByPlaceholderText('50.90970')
+screen.getByPlaceholderText('50.90970');
 
 // By text
-screen.getByText('Start point set')
+screen.getByText('Start point set');
 
 // Multiple elements
-screen.getAllByText('—')
+screen.getAllByText('—');
 
 // With waiting for async
 await waitFor(() => {
@@ -237,11 +250,13 @@ describe('NewComponent', () => {
 ## Coverage Goals
 
 Current test coverage:
+
 - **Route Utilities**: 100% (pure functions)
 - **Map Component**: 100% (with mocks)
 - **Page Component**: Core functionality covered
 
 **Target Areas for Additional Tests:**
+
 - Error boundary handling
 - Browser API fallbacks
 - Accessibility features (keyboard navigation)
@@ -273,13 +288,6 @@ node --inspect-brk node_modules/.bin/jest --runInBand
 npm test -- --verbose
 ```
 
-## Resources
-
-- [Jest Documentation](https://jestjs.io/docs/getting-started)
-- [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
-- [Next.js Testing Guide](https://nextjs.org/docs/testing)
-- [Best Practices](https://kentcdodds.com/blog/common-mistakes-with-react-testing-library)
-
 ## Continuous Integration
 
 To run tests automatically in CI/CD pipelines:
@@ -289,4 +297,3 @@ To run tests automatically in CI/CD pipelines:
 - name: Run tests
   run: npm test -- --coverage --watchAll=false
 ```
-

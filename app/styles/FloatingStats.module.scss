@@ -1,6 +1,6 @@
 @use './variables' as *;
 
-.floating-stats {
+.floatingStats {
   position: fixed;
   top: 24px;
   right: 24px;
@@ -18,24 +18,24 @@
     border-color 0.3s ease;
 }
 
-html[data-theme='dark'] .floating-stats {
+:global(html[data-theme='dark']) .floatingStats {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-.float-stat {
+.floatStat {
   display: flex;
   flex-direction: column;
   gap: space(xs);
 }
 
-.float-stat-label {
+.floatStatLabel {
   font-size: 11px;
   color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
 
-.float-stat-value {
+.floatStatValue {
   font-size: 20px;
   font-weight: 500;
   font-family:
@@ -45,7 +45,7 @@ html[data-theme='dark'] .floating-stats {
 }
 
 @media (max-width: $mobile-breakpoint) {
-  .floating-stats {
+  .floatingStats {
     top: auto;
     right: 24px;
     bottom: 100px;

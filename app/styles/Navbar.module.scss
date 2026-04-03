@@ -1,12 +1,13 @@
 @use './variables' as *;
 
-header {
+.header {
   padding: space(xl) space(xxl);
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   gap: space(md);
+  flex-shrink: 0;
   transition:
     background-color 0.3s ease,
     border-color 0.3s ease;
@@ -27,7 +28,7 @@ header {
   }
 }
 
-.logo-mark {
+.logoMark {
   width: 32px;
   height: 32px;
   background: color(green);

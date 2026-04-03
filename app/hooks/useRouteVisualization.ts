@@ -1,14 +1,14 @@
 import { useEffect, useRef } from 'react';
-import L from 'leaflet';
+import type { Map, LayerGroup } from 'leaflet';
 
 interface UseRouteVisualizationProps {
-  mapRef: React.MutableRefObject<L.Map | null>;
+  mapRef: React.MutableRefObject<Map | null>;
   route: [number, number][] | null;
   waypoints: [number, number][] | null;
 }
 
 export const useRouteVisualization = ({ mapRef, route, waypoints }: UseRouteVisualizationProps) => {
-  const routeLayerRef = useRef<L.LayerGroup | null>(null);
+  const routeLayerRef = useRef<LayerGroup | null>(null);
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -18,7 +18,13 @@ export const useRouteVisualization = ({ mapRef, route, waypoints }: UseRouteVisu
       routeLayerRef.current = null;
     }
 
-    if (route && route.length > 0) {
+    if (!route || route.length === 0) return;
+
+    let cancelled = false;
+
+    import('leaflet').then((L) => {
+      if (cancelled || !mapRef.current) return;
+
       const layer = L.layerGroup().addTo(mapRef.current);
       const poly = L.polyline(route, {
         color: '#1D9E75',
@@ -42,7 +48,11 @@ export const useRouteVisualization = ({ mapRef, route, waypoints }: UseRouteVisu
 
       mapRef.current.fitBounds(poly.getBounds(), { padding: [40, 40] });
       routeLayerRef.current = layer;
-    }
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, [route, waypoints, mapRef]);
 
   return { routeLayerRef };

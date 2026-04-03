@@ -11,34 +11,7 @@
   transition:
     background-color 0.3s ease,
     border-color 0.3s ease;
-}
 
-.sidebar-close {
-  display: none;
-}
-
-// Form elements scoped to sidebar context
-.section-label {
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: space(sm);
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: space(xs);
-
-  label {
-    font-size: 13px;
-    color: var(--muted);
-  }
-}
-
-.sidebar {
   input[type='number'],
   input[type='text'],
   select {
@@ -94,13 +67,36 @@
   }
 }
 
-.coord-row {
+.sidebarClose {
+  display: none;
+}
+
+.sectionLabel {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: space(sm);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: space(xs);
+
+  label {
+    font-size: 13px;
+    color: var(--muted);
+  }
+}
+
+.coordRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: space(sm);
 }
 
-// Dividers & separators
 .divider {
   display: flex;
   align-items: center;
@@ -124,19 +120,17 @@
   background: var(--border);
 }
 
-// Primary button variant
-button.primary {
-  background: var(--green);
-  color: white;
-  border-color: var(--green);
+.primary {
+  background: var(--green) !important;
+  color: white !important;
+  border-color: var(--green) !important;
 
   &:hover {
-    background: var(--green-dark);
-    border-color: var(--green-dark);
+    background: var(--green-dark) !important;
+    border-color: var(--green-dark) !important;
   }
 }
 
-// Status message
 .status {
   font-size: 12px;
   color: var(--muted);
@@ -150,25 +144,24 @@ button.primary {
     background-color 0.3s ease,
     color 0.3s ease,
     border-color 0.3s ease;
-
-  &.err {
-    color: color(error);
-    background: var(--error-light);
-    border-color: rgba(192, 57, 43, 0.2);
-  }
-
-  &.ok {
-    color: var(--text);
-    background: var(--green-light);
-    border-color: rgba(29, 158, 117, 0.2);
-  }
 }
 
-[data-theme='dark'] .status.ok {
+.err {
+  color: color(error);
+  background: var(--error-light);
+  border-color: rgba(192, 57, 43, 0.2);
+}
+
+.ok {
+  color: var(--text);
+  background: var(--green-light);
+  border-color: rgba(29, 158, 117, 0.2);
+}
+
+:global([data-theme='dark']) .ok {
   color: #a3ffd8;
 }
 
-// Statistics
 .stats {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -183,13 +176,13 @@ button.primary {
   transition:
     background-color 0.3s ease,
     border-color 0.3s ease;
-
-  &.full {
-    grid-column: span 2;
-  }
 }
 
-.stat-label {
+.full {
+  grid-column: span 2;
+}
+
+.statLabel {
   font-size: 11px;
   color: var(--muted);
   text-transform: uppercase;
@@ -197,7 +190,7 @@ button.primary {
   margin-bottom: space(xs);
 }
 
-.stat-value {
+.statValue {
   font-size: 20px;
   font-weight: 500;
   font-family:
@@ -206,7 +199,11 @@ button.primary {
   color: var(--text);
 }
 
-// Sidebar responsive
+.open {
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
 @media (max-width: $mobile-breakpoint) {
   .sidebar {
     position: fixed;
@@ -230,7 +227,7 @@ button.primary {
     }
   }
 
-  .sidebar-close {
+  .sidebarClose {
     display: block;
     align-self: flex-end;
     width: 32px;
