@@ -5,6 +5,9 @@
   grid-template-columns: 300px 1fr;
   flex: 1;
   height: calc(100vh - #{$header-height});
+  height: calc(100dvh - #{$header-height});
+  min-height: calc(100vh - #{$header-height});
+  min-height: calc(100dvh - #{$header-height});
 }
 
 .menuBackdrop {
@@ -16,6 +19,9 @@
     grid-template-columns: 1fr;
     grid-template-rows: 1fr;
     height: calc(100vh - #{$header-height});
+    height: calc(100dvh - #{$header-height});
+    min-height: calc(100vh - #{$header-height});
+    min-height: calc(100dvh - #{$header-height});
     position: relative;
   }
 
