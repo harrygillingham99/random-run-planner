@@ -17,31 +17,35 @@ interface UseRouteFormOptions {
 }
 
 export const useRouteForm = (options: UseRouteFormOptions = {}) => {
-  const [lat, setLat] = useState<number>(options.initialLat ?? 50.9097);
-  const [lng, setLng] = useState<number>(options.initialLng ?? -1.4044);
+  const [coords, setCoords] = useState({
+    lat: options.initialLat ?? 50.9097,
+    lng: options.initialLng ?? -1.4044,
+  });
   const [distance, setDistance] = useState<number>(options.initialDistance ?? 5);
   const [style, setStyle] = useState<RouteStyle>(options.initialStyle ?? 'loop');
 
   const setCoordinates = (newLat: number, newLng: number) => {
-    setLat(newLat);
-    setLng(newLng);
+    setCoords({ lat: newLat, lng: newLng });
   };
 
   const updateLat = (newLat: number) => {
-    setLat(newLat);
-    return !isNaN(newLat) && !isNaN(lng);
+    setCoords((prev) => ({ ...prev, lat: newLat }));
+    return !isNaN(newLat) && !isNaN(coords.lng);
   };
 
   const updateLng = (newLng: number) => {
-    setLng(newLng);
-    return !isNaN(lat) && !isNaN(newLng);
+    setCoords((prev) => ({ ...prev, lng: newLng }));
+    return !isNaN(coords.lat) && !isNaN(newLng);
   };
 
-  const hasValidCoordinates = useMemo(() => !isNaN(lat) && !isNaN(lng), [lat, lng]);
+  const hasValidCoordinates = useMemo(
+    () => !isNaN(coords.lat) && !isNaN(coords.lng),
+    [coords.lat, coords.lng],
+  );
 
   return {
-    lat,
-    lng,
+    lat: coords.lat,
+    lng: coords.lng,
     distance,
     style,
     setDistance,

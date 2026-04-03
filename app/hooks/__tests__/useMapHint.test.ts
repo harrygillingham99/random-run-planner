@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { useMapHint } from '@/app/hooks/useMapHint';
+import { useMapHint } from 'hooks/useMapHint';
 
 describe('useMapHint', () => {
   it('should initialize with hint visible', () => {

@@ -1,34 +1,43 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import Sidebar from '@/app/components/Sidebar';
+import Sidebar from 'components/Sidebar';
+import { RunPlannerContext } from 'context/RunPlannerContext';
+import type { RunPlannerContextValue } from 'context/RunPlannerContext';
 
 describe('Sidebar Component', () => {
-  const defaultProps = {
-    isOpen: true,
-    onClose: jest.fn(),
+  const defaultContext: RunPlannerContextValue = {
     lat: 50.9097,
     lng: -1.4044,
+    distance: 5,
+    style: 'loop',
+    hasValidCoordinates: true,
     onLatChange: jest.fn(),
     onLngChange: jest.fn(),
-    onGeoLocation: jest.fn(),
-    distance: 5,
     onDistanceChange: jest.fn(),
-    style: 'loop' as const,
     onStyleChange: jest.fn(),
-    onGenerateRoute: jest.fn(),
+    onGeoLocation: jest.fn(),
+    status: { message: 'Test status', type: '' },
+    routeData: { route: null, waypoints: null },
+    stats: { distance: '5.00 km', time: '30 min', pace: '6:00/km', waypoints: 0 },
     isGenerating: false,
-    status: { message: 'Test status', type: '' as const },
-    stats: {
-      distance: '5.00 km',
-      time: '30 min',
-      pace: '6:00/km',
-      waypoints: 0,
-    },
+    sidebarOpen: true,
+    setSidebarOpen: jest.fn(),
+    onGenerateRoute: jest.fn(),
+    onMapClick: jest.fn(),
+    onLocationFound: jest.fn(),
+    onLocationError: jest.fn(),
   };
 
+  const renderSidebar = (overrides: Partial<RunPlannerContextValue> = {}) =>
+    render(
+      <RunPlannerContext.Provider value={{ ...defaultContext, ...overrides }}>
+        <Sidebar />
+      </RunPlannerContext.Provider>,
+    );
+
   it('should render the sidebar with all sections', () => {
-    render(<Sidebar {...defaultProps} />);
+    renderSidebar();
 
     expect(screen.getByText('Start point')).toBeInTheDocument();
     expect(screen.getByText('Route settings')).toBeInTheDocument();
@@ -38,7 +47,7 @@ describe('Sidebar Component', () => {
   });
 
   it('should render coordinate inputs with correct values', () => {
-    render(<Sidebar {...defaultProps} />);
+    renderSidebar();
 
     const latInput = screen.getByPlaceholderText('50.90970') as HTMLInputElement;
     const lngInput = screen.getByPlaceholderText('-1.40440') as HTMLInputElement;
@@ -49,10 +58,10 @@ describe('Sidebar Component', () => {
 
   it('should call onLatChange when latitude input changes', async () => {
     const onLatChange = jest.fn();
-    render(<Sidebar {...defaultProps} onLatChange={onLatChange} />);
+    renderSidebar({ onLatChange });
 
     const latInput = screen.getByPlaceholderText('50.90970') as HTMLInputElement;
-    
+
     // Use fireEvent for direct input changes instead of userEvent
     fireEvent.change(latInput, { target: { value: '51.5074' } });
 
@@ -61,10 +70,10 @@ describe('Sidebar Component', () => {
 
   it('should call onLngChange when longitude input changes', async () => {
     const onLngChange = jest.fn();
-    render(<Sidebar {...defaultProps} onLngChange={onLngChange} />);
+    renderSidebar({ onLngChange });
 
     const lngInput = screen.getByPlaceholderText('-1.40440') as HTMLInputElement;
-    
+
     // Use fireEvent for direct input changes instead of userEvent
     fireEvent.change(lngInput, { target: { value: '-0.1278' } });
 
@@ -74,7 +83,7 @@ describe('Sidebar Component', () => {
   it('should handle invalid latitude input', async () => {
     const user = userEvent.setup();
     const onLatChange = jest.fn();
-    render(<Sidebar {...defaultProps} onLatChange={onLatChange} />);
+    renderSidebar({ onLatChange });
 
     const latInput = screen.getByPlaceholderText('50.90970');
     // Try to set invalid value (>90)
@@ -88,7 +97,7 @@ describe('Sidebar Component', () => {
   it('should handle invalid longitude input', async () => {
     const user = userEvent.setup();
     const onLngChange = jest.fn();
-    render(<Sidebar {...defaultProps} onLngChange={onLngChange} />);
+    renderSidebar({ onLngChange });
 
     const lngInput = screen.getByPlaceholderText('-1.40440');
     // Try to set invalid value (>180)
@@ -102,7 +111,7 @@ describe('Sidebar Component', () => {
   it('should call onGeoLocation when geolocation button is clicked', async () => {
     const user = userEvent.setup();
     const onGeoLocation = jest.fn();
-    render(<Sidebar {...defaultProps} onGeoLocation={onGeoLocation} />);
+    renderSidebar({ onGeoLocation });
 
     const geoButton = screen.getByRole('button', { name: /Detect my location/i });
     await user.click(geoButton);
@@ -111,7 +120,7 @@ describe('Sidebar Component', () => {
   });
 
   it('should render distance input with correct value', () => {
-    render(<Sidebar {...defaultProps} distance={5} />);
+    renderSidebar({ distance: 5 });
 
     const distanceInput = screen.getByDisplayValue('5') as HTMLInputElement;
 
@@ -121,7 +130,7 @@ describe('Sidebar Component', () => {
 
   it('should call onDistanceChange when distance input changes', async () => {
     const onDistanceChange = jest.fn();
-    render(<Sidebar {...defaultProps} onDistanceChange={onDistanceChange} />);
+    renderSidebar({ onDistanceChange });
 
     const distanceInput = screen.getByDisplayValue('5') as HTMLInputElement;
 
@@ -130,7 +139,7 @@ describe('Sidebar Component', () => {
   });
 
   it('should render style select with correct value', () => {
-    render(<Sidebar {...defaultProps} style="loop" />);
+    renderSidebar();
 
     const styleSelect = screen.getByDisplayValue('Loop — return to start') as HTMLSelectElement;
     expect(styleSelect).toBeInTheDocument();
@@ -140,7 +149,7 @@ describe('Sidebar Component', () => {
   it('should call onStyleChange when style select changes', async () => {
     const user = userEvent.setup();
     const onStyleChange = jest.fn();
-    render(<Sidebar {...defaultProps} onStyleChange={onStyleChange} />);
+    renderSidebar({ onStyleChange });
 
     const styleSelect = screen.getByDisplayValue('Loop — return to start');
     await user.selectOptions(styleSelect, 'outback');
@@ -149,20 +158,14 @@ describe('Sidebar Component', () => {
   });
 
   it('should disable generate button when generating', () => {
-    render(<Sidebar {...defaultProps} isGenerating={true} />);
+    renderSidebar({ isGenerating: true });
 
     const generateButton = screen.getByRole('button', { name: /Generating/ });
     expect(generateButton).toBeDisabled();
   });
 
   it('should disable generate button when coordinates are missing/invalid', () => {
-    // Create props with 0 values instead of NaN to test disabled state
-    const invalidProps = {
-      ...defaultProps,
-      lat: 0,
-      lng: 0,
-    };
-    render(<Sidebar {...invalidProps} />);
+    renderSidebar({ lat: 0, lng: 0 });
 
     const generateButton = screen.getByRole('button', { name: /Generate run/i });
     // Button should be enabled (coordinates are valid numbers, even if 0,0)
@@ -172,7 +175,7 @@ describe('Sidebar Component', () => {
   it('should call onGenerateRoute when generate button is clicked', async () => {
     const user = userEvent.setup();
     const onGenerateRoute = jest.fn();
-    render(<Sidebar {...defaultProps} onGenerateRoute={onGenerateRoute} />);
+    renderSidebar({ onGenerateRoute });
 
     const generateButton = screen.getByRole('button', { name: /Generate run/i });
     await user.click(generateButton);
@@ -182,21 +185,21 @@ describe('Sidebar Component', () => {
 
   it('should display status message', () => {
     const status = { message: 'Test status message', type: 'ok' as const };
-    render(<Sidebar {...defaultProps} status={status} />);
+    renderSidebar({ status });
 
     expect(screen.getByText('Test status message')).toBeInTheDocument();
   });
 
   it('should apply status type class', () => {
     const status = { message: 'Error occurred', type: 'err' as const };
-    render(<Sidebar {...defaultProps} status={status} />);
+    renderSidebar({ status });
 
     const statusElement = screen.getByText('Error occurred');
     expect(statusElement.className).toContain('err');
   });
 
   it('should display all stats', () => {
-    render(<Sidebar {...defaultProps} />);
+    renderSidebar();
 
     expect(screen.getByText('5.00 km')).toBeInTheDocument();
     expect(screen.getByText('30 min')).toBeInTheDocument();
@@ -204,23 +207,28 @@ describe('Sidebar Component', () => {
     expect(screen.getByText('0')).toBeInTheDocument(); // waypoints count
   });
 
-  it('should call onClose when close button is clicked', async () => {
+  it('should call setSidebarOpen(false) when close button is clicked', async () => {
     const user = userEvent.setup();
-    const onClose = jest.fn();
-    render(<Sidebar {...defaultProps} onClose={onClose} />);
+    const setSidebarOpen = jest.fn();
+    renderSidebar({ setSidebarOpen });
 
     const closeButton = screen.getByRole('button', { name: /Close menu/i });
     await user.click(closeButton);
 
-    expect(onClose).toHaveBeenCalled();
+    expect(setSidebarOpen).toHaveBeenCalledWith(false);
   });
 
   it('should render different text when sidebar is closed', () => {
-    const { rerender } = render(<Sidebar {...defaultProps} isOpen={true} />);
+    const Wrapper = ({ sidebarOpen }: { sidebarOpen: boolean }) => (
+      <RunPlannerContext.Provider value={{ ...defaultContext, sidebarOpen }}>
+        <Sidebar />
+      </RunPlannerContext.Provider>
+    );
+    const { rerender } = render(<Wrapper sidebarOpen={true} />);
 
     expect(screen.getByRole('button', { name: /Close menu/i })).toBeInTheDocument();
 
-    rerender(<Sidebar {...defaultProps} isOpen={false} />);
+    rerender(<Wrapper sidebarOpen={false} />);
 
     // Sidebar should still exist but with different styles (checked via className)
     const sidebar = screen.getByRole('button', { name: /Close menu/i }).closest('.sidebar');
@@ -228,7 +236,7 @@ describe('Sidebar Component', () => {
   });
 
   it('should show loading text on generate button when generating', () => {
-    render(<Sidebar {...defaultProps} isGenerating={true} />);
+    renderSidebar({ isGenerating: true });
 
     expect(screen.getByText('Generating...')).toBeInTheDocument();
   });

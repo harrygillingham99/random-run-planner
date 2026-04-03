@@ -1,26 +1,27 @@
 import { renderHook } from '@testing-library/react';
-import { useRouteVisualization } from '@/app/hooks/useRouteVisualization';
-import React from 'react';
+import { useRouteVisualization } from 'hooks/useRouteVisualization';
+import type React from 'react';
+import * as Leaflet from 'leaflet';
 
 // Mock Leaflet
 jest.mock('leaflet', (): Record<string, unknown> => {
   const mockPolyline = {
-    addTo: jest.fn(function (this: any) { return this; }),
-    getBounds: jest.fn(() => [[[50, -1], [50.1, -1.1]]]),
+    addTo: jest.fn().mockReturnThis(),
+    getBounds: jest.fn(() => [
+      [
+        [50, -1],
+        [50.1, -1.1],
+      ],
+    ]),
   };
 
   const mockMarker = {
-    addTo: jest.fn(function (this: any) { return this; }),
-    bindPopup: jest.fn(function (this: any) { return this; }),
+    addTo: jest.fn().mockReturnThis(),
+    bindPopup: jest.fn().mockReturnThis(),
   };
 
   const mockLayerGroup = {
-    addTo: jest.fn(function (this: any) { return this; }),
-  };
-
-  const mockMap = {
-    removeLayer: jest.fn(),
-    fitBounds: jest.fn(),
+    addTo: jest.fn().mockReturnThis(),
   };
 
   return {
@@ -31,8 +32,15 @@ jest.mock('leaflet', (): Record<string, unknown> => {
 });
 
 describe('useRouteVisualization', () => {
-  const L = require('leaflet');
-  let mockMapRef: React.MutableRefObject<any>;
+  const L = Leaflet as unknown as {
+    layerGroup: jest.Mock;
+    polyline: jest.Mock;
+    circleMarker: jest.Mock;
+  };
+  let mockMapRef: React.MutableRefObject<{
+    removeLayer: jest.Mock;
+    fitBounds: jest.Mock;
+  }>;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -50,7 +58,7 @@ describe('useRouteVisualization', () => {
         mapRef: mockMapRef,
         route: null,
         waypoints: null,
-      })
+      }),
     );
 
     expect(result.current.routeLayerRef).toBeDefined();
@@ -62,7 +70,7 @@ describe('useRouteVisualization', () => {
         mapRef: mockMapRef,
         route: null,
         waypoints: null,
-      })
+      }),
     );
 
     expect(L.layerGroup).not.toHaveBeenCalled();
@@ -74,21 +82,24 @@ describe('useRouteVisualization', () => {
         mapRef: mockMapRef,
         route: [],
         waypoints: null,
-      })
+      }),
     );
 
     expect(L.layerGroup).not.toHaveBeenCalled();
   });
 
   it('should create layer group and add to map', () => {
-    const route: [number, number][] = [[50, -1], [50.1, -1.1]];
+    const route: [number, number][] = [
+      [50, -1],
+      [50.1, -1.1],
+    ];
 
     renderHook(() =>
       useRouteVisualization({
         mapRef: mockMapRef,
         route,
         waypoints: null,
-      })
+      }),
     );
 
     expect(L.layerGroup).toHaveBeenCalled();
@@ -97,14 +108,17 @@ describe('useRouteVisualization', () => {
   });
 
   it('should create polyline with correct properties', () => {
-    const route: [number, number][] = [[50, -1], [50.1, -1.1]];
+    const route: [number, number][] = [
+      [50, -1],
+      [50.1, -1.1],
+    ];
 
     renderHook(() =>
       useRouteVisualization({
         mapRef: mockMapRef,
         route,
         waypoints: null,
-      })
+      }),
     );
 
     expect(L.polyline).toHaveBeenCalledWith(
@@ -113,19 +127,22 @@ describe('useRouteVisualization', () => {
         color: '#1D9E75',
         weight: 5,
         opacity: 0.9,
-      })
+      }),
     );
   });
 
   it('should add polyline to layer group', () => {
-    const route: [number, number][] = [[50, -1], [50.1, -1.1]];
+    const route: [number, number][] = [
+      [50, -1],
+      [50.1, -1.1],
+    ];
 
     renderHook(() =>
       useRouteVisualization({
         mapRef: mockMapRef,
         route,
         waypoints: null,
-      })
+      }),
     );
 
     const mockPolyline = L.polyline.mock.results[0].value;
@@ -133,22 +150,31 @@ describe('useRouteVisualization', () => {
   });
 
   it('should create waypoint markers', () => {
-    const route: [number, number][] = [[50, -1], [50.1, -1.1]];
-    const waypoints: [number, number][] = [[50.05, -1.05], [50.08, -1.08]];
+    const route: [number, number][] = [
+      [50, -1],
+      [50.1, -1.1],
+    ];
+    const waypoints: [number, number][] = [
+      [50.05, -1.05],
+      [50.08, -1.08],
+    ];
 
     renderHook(() =>
       useRouteVisualization({
         mapRef: mockMapRef,
         route,
         waypoints,
-      })
+      }),
     );
 
     expect(L.circleMarker).toHaveBeenCalledTimes(waypoints.length);
   });
 
   it('should create waypoint markers with correct properties', () => {
-    const route: [number, number][] = [[50, -1], [50.1, -1.1]];
+    const route: [number, number][] = [
+      [50, -1],
+      [50.1, -1.1],
+    ];
     const waypoints: [number, number][] = [[50.05, -1.05]];
 
     renderHook(() =>
@@ -156,7 +182,7 @@ describe('useRouteVisualization', () => {
         mapRef: mockMapRef,
         route,
         waypoints,
-      })
+      }),
     );
 
     expect(L.circleMarker).toHaveBeenCalledWith(
@@ -167,12 +193,15 @@ describe('useRouteVisualization', () => {
         color: '#fff',
         weight: 2,
         fillOpacity: 1,
-      })
+      }),
     );
   });
 
   it('should bind popup to waypoint markers', () => {
-    const route: [number, number][] = [[50, -1], [50.1, -1.1]];
+    const route: [number, number][] = [
+      [50, -1],
+      [50.1, -1.1],
+    ];
     const waypoints: [number, number][] = [[50.05, -1.05]];
 
     renderHook(() =>
@@ -180,7 +209,7 @@ describe('useRouteVisualization', () => {
         mapRef: mockMapRef,
         route,
         waypoints,
-      })
+      }),
     );
 
     const mockMarker = L.circleMarker.mock.results[0].value;
@@ -188,25 +217,39 @@ describe('useRouteVisualization', () => {
   });
 
   it('should fit map bounds to route', () => {
-    const route: [number, number][] = [[50, -1], [50.1, -1.1]];
+    const route: [number, number][] = [
+      [50, -1],
+      [50.1, -1.1],
+    ];
 
     renderHook(() =>
       useRouteVisualization({
         mapRef: mockMapRef,
         route,
         waypoints: null,
-      })
+      }),
     );
 
     expect(mockMapRef.current.fitBounds).toHaveBeenCalledWith(
-      [[[50, -1], [50.1, -1.1]]],
-      { padding: [40, 40] }
+      [
+        [
+          [50, -1],
+          [50.1, -1.1],
+        ],
+      ],
+      { padding: [40, 40] },
     );
   });
 
   it('should remove previous route when route prop changes', () => {
-    const route1: [number, number][] = [[50, -1], [50.1, -1.1]];
-    const route2: [number, number][] = [[51, -2], [51.1, -2.1]];
+    const route1: [number, number][] = [
+      [50, -1],
+      [50.1, -1.1],
+    ];
+    const route2: [number, number][] = [
+      [51, -2],
+      [51.1, -2.1],
+    ];
 
     const { rerender } = renderHook(
       ({ route }) =>
@@ -215,7 +258,7 @@ describe('useRouteVisualization', () => {
           route,
           waypoints: null,
         }),
-      { initialProps: { route: route1 } }
+      { initialProps: { route: route1 } },
     );
 
     expect(L.layerGroup).toHaveBeenCalledTimes(1);
@@ -227,7 +270,10 @@ describe('useRouteVisualization', () => {
   });
 
   it('should clear route layer when route is removed', () => {
-    const route: [number, number][] = [[50, -1], [50.1, -1.1]];
+    const route: [number, number][] = [
+      [50, -1],
+      [50.1, -1.1],
+    ];
 
     const { rerender } = renderHook(
       ({ route: routeProp }: { route: [number, number][] | null }) =>
@@ -236,10 +282,10 @@ describe('useRouteVisualization', () => {
           route: routeProp,
           waypoints: null,
         }),
-      { initialProps: { route } as any }
+      { initialProps: { route } },
     );
 
-    rerender({ route: null } as any);
+    rerender({ route: null });
 
     expect(mockMapRef.current.removeLayer).toHaveBeenCalled();
   });

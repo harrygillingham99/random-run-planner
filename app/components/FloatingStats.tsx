@@ -1,17 +1,17 @@
 'use client';
 
+import { useRunPlanner } from '../context/RunPlannerContext';
 import '../styles/FloatingStats.scss';
 
-interface FloatingStatsProps {
-  distance: string;
-  time: string;
-  isVisible: boolean;
-}
+export default function FloatingStats() {
+  const { stats, routeData, sidebarOpen } = useRunPlanner();
+  const isVisible = routeData.route !== null && !sidebarOpen;
 
-export default function FloatingStats({ distance, time, isVisible }: FloatingStatsProps) {
   if (!isVisible) {
     return null;
   }
+
+  const { distance, time } = stats;
 
   return (
     <div className="floating-stats">

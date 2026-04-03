@@ -1,91 +1,54 @@
 'use client';
 
+import { useRunPlanner } from '../context/RunPlannerContext';
 import '../styles/Sidebar.scss';
 
-interface SidebarProps {
-  isOpen: boolean;
-  onClose: () => void;
-  lat: number;
-  lng: number;
-  onLatChange: (value: number) => void;
-  onLngChange: (value: number) => void;
-  onGeoLocation: () => void;
-  distance: number;
-  onDistanceChange: (value: number) => void;
-  style: 'loop' | 'outback';
-  onStyleChange: (value: 'loop' | 'outback') => void;
-  onGenerateRoute: () => void;
-  isGenerating: boolean;
-  status: { message: string; type: '' | 'ok' | 'err' };
-  stats: {
-    distance: string;
-    time: string;
-    pace: string;
-    waypoints: number;
-  };
-}
+const parseDecimalInput = (raw: string): number | null => {
+  const normalized = raw.replace(',', '.').trim();
+  if (!normalized) return null;
+  const value = Number(normalized);
+  return Number.isNaN(value) ? null : value;
+};
 
-export default function Sidebar({
-  isOpen,
-  onClose,
-  lat,
-  lng,
-  onLatChange,
-  onLngChange,
-  onGeoLocation,
-  distance,
-  onDistanceChange,
-  style,
-  onStyleChange,
-  onGenerateRoute,
-  isGenerating,
-  status,
-  stats,
-}: SidebarProps) {
+export default function Sidebar() {
+  const {
+    lat,
+    lng,
+    distance,
+    style,
+    onLatChange,
+    onLngChange,
+    onDistanceChange,
+    onStyleChange,
+    onGeoLocation,
+    onGenerateRoute,
+    isGenerating,
+    status,
+    stats,
+    sidebarOpen,
+    setSidebarOpen,
+  } = useRunPlanner();
+
   const handleLatChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const normalized = e.target.value.replace(',', '.').trim();
-    if (!normalized) {
-      return;
-    }
-
-    const value = Number(normalized);
-    if (!Number.isNaN(value) && value >= -90 && value <= 90) {
-      onLatChange(value);
-    }
+    const value = parseDecimalInput(e.target.value);
+    if (value !== null && value >= -90 && value <= 90) onLatChange(value);
   };
 
   const handleLngChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const normalized = e.target.value.replace(',', '.').trim();
-    if (!normalized) {
-      return;
-    }
-
-    const value = Number(normalized);
-    if (!Number.isNaN(value) && value >= -180 && value <= 180) {
-      onLngChange(value);
-    }
+    const value = parseDecimalInput(e.target.value);
+    if (value !== null && value >= -180 && value <= 180) onLngChange(value);
   };
 
   const handleDistanceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const normalized = e.target.value.replace(',', '.').trim();
-    if (!normalized) {
-      return;
-    }
-
-    const value = Number(normalized);
-    if (Number.isNaN(value)) {
-      return;
-    }
-
-    const clampedValue = Math.min(30, Math.max(1, value));
-    onDistanceChange(clampedValue);
+    const value = parseDecimalInput(e.target.value);
+    if (value !== null) onDistanceChange(Math.min(30, Math.max(1, value)));
   };
 
   return (
-    <div className={`sidebar ${isOpen ? 'open' : ''}`}>
+    <div className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
       <button
         className="sidebar-close"
-        onClick={onClose}
+        onClick={() => setSidebarOpen(false)}
         aria-label="Close menu"
       >
         ✕
@@ -149,7 +112,10 @@ export default function Sidebar({
           </div>
           <div className="field">
             <label>Route style</label>
-            <select value={style} onChange={(e) => onStyleChange(e.target.value as 'loop' | 'outback')}>
+            <select
+              value={style}
+              onChange={(e) => onStyleChange(e.target.value as 'loop' | 'outback')}
+            >
               <option value="loop">Loop — return to start</option>
               <option value="outback">Out and back</option>
             </select>

@@ -1,4 +1,4 @@
-import { offset, calculateStats, osrmRoute } from '@/app/lib/routeUtils';
+import { offset, calculateStats, osrmRoute } from 'lib/routeUtils';
 
 describe('routeUtils', () => {
   describe('osrmRoute', () => {
@@ -84,7 +84,7 @@ describe('routeUtils', () => {
   describe('offset', () => {
     it('should calculate offset coordinates correctly', () => {
       const [lat, lng] = offset(50.9097, -1.4044, 1, 0);
-      
+
       // Moving 1 km north
       expect(lat).toBeGreaterThan(50.9097);
       expect(lng).toBeCloseTo(-1.4044, 4);
@@ -104,14 +104,14 @@ describe('routeUtils', () => {
 
     it('should handle zero distance', () => {
       const [lat, lng] = offset(50, 0, 0, 45);
-      
+
       expect(lat).toBe(50);
       expect(lng).toBe(0);
     });
 
     it('should handle large distances', () => {
       const [lat, lng] = offset(0, 0, 1000, 90);
-      
+
       expect(lat).toBeDefined();
       expect(lng).toBeDefined();
       expect(Math.abs(lat)).toBeLessThan(90);
@@ -120,7 +120,7 @@ describe('routeUtils', () => {
 
     it('should handle negative coordinates', () => {
       const [lat, lng] = offset(-50, -100, 10, 45);
-      
+
       expect(lat).toBeDefined();
       expect(lng).toBeDefined();
     });
@@ -138,7 +138,7 @@ describe('routeUtils', () => {
     it('should format time correctly for short runs', () => {
       // 1km at 6min/km = 6 minutes
       const stats = calculateStats(1000);
-      
+
       expect(stats.distance).toBe('1.00 km');
       expect(stats.time).toBe('6 min');
     });
@@ -146,27 +146,27 @@ describe('routeUtils', () => {
     it('should format time correctly for long runs', () => {
       // 10km at 6min/km = 60 minutes = 1h 0m
       const stats = calculateStats(10000);
-      
+
       expect(stats.distance).toBe('10.00 km');
       expect(stats.time).toBe('1h 0m');
     });
 
     it('should handle decimal kilometers', () => {
       const stats = calculateStats(5250);
-      
+
       expect(stats.distance).toBe('5.25 km');
     });
 
     it('should handle very small distances', () => {
       const stats = calculateStats(100);
-      
+
       expect(stats.distance).toBe('0.10 km');
       expect(stats.time).toMatch(/\d+ min/);
     });
 
     it('should handle zero distance', () => {
       const stats = calculateStats(0);
-      
+
       expect(stats.distance).toBe('0.00 km');
       expect(stats.time).toBe('0 min');
     });

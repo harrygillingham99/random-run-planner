@@ -4,19 +4,11 @@ import { useMapInitialization } from '../hooks/useMapInitialization';
 import { useStartMarker } from '../hooks/useStartMarker';
 import { useRouteVisualization } from '../hooks/useRouteVisualization';
 import { useMapHint } from '../hooks/useMapHint';
+import { useRunPlanner } from '../context/RunPlannerContext';
 import '../styles/Map.scss';
 
-interface MapProps {
-  lat: number;
-  lng: number;
-  onMapClick: (lat: number, lng: number) => void;
-  onLocationFound?: (lat: number, lng: number) => void;
-  onLocationError?: (error: string) => void;
-  route: [number, number][] | null;
-  waypoints: [number, number][] | null;
-}
-
-export default function Map({ lat, lng, onMapClick, onLocationFound, onLocationError, route, waypoints }: MapProps) {
+export default function Map() {
+  const { lat, lng, onMapClick, onLocationFound, onLocationError, routeData } = useRunPlanner();
   const { showHint, hideHint } = useMapHint();
 
   const { mapContainer, mapRef } = useMapInitialization({
@@ -29,7 +21,7 @@ export default function Map({ lat, lng, onMapClick, onLocationFound, onLocationE
   });
 
   useStartMarker({ mapRef, lat, lng });
-  useRouteVisualization({ mapRef, route, waypoints });
+  useRouteVisualization({ mapRef, route: routeData.route, waypoints: routeData.waypoints });
 
   return (
     <div id="map-container" ref={mapContainer} className="map-container">

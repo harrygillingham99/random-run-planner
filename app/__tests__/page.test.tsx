@@ -1,37 +1,39 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import Home from '@/app/page';
+import Home from '../page';
 
 // Mock next/dynamic
 jest.mock('next/dynamic', () => ({
   __esModule: true,
-  default: (...args: any[]) => {
+  default: (...args: unknown[]) => {
     const dynamicModule = jest.requireActual('next/dynamic');
     const dynamicActualComp = dynamicModule.default;
     const RequiredComponent = dynamicActualComp(args[0]);
-    RequiredComponent.preload
-      ? RequiredComponent.preload()
-      : RequiredComponent.render.preload();
+    if (RequiredComponent.preload) {
+      RequiredComponent.preload();
+    } else {
+      RequiredComponent.render.preload();
+    }
     return RequiredComponent;
   },
 }));
 
 // Mock the Map component
-jest.mock('@/app/components/Map', () => {
-  return function MockMap(props: any) {
+jest.mock('components/Map', () => {
+  return function MockMap() {
     return <div data-testid="map-component">Map Component</div>;
   };
 });
 
 // Mock route utilities
-jest.mock('@/app/lib/routeUtils', () => ({
+jest.mock('lib/routeUtils', () => ({
   generateRoute: jest.fn(),
   calculateStats: jest.fn(),
 }));
 
-// Mock RouteGeneratorClient
-jest.mock('@/app/components/RouteGeneratorClient', () => {
-  return function MockRouteGeneratorClient() {
+// Mock RunPlanner
+jest.mock('components/RunPlanner', () => {
+  return function MockRunPlanner() {
     return <div data-testid="route-generator-client">Route Generator Client</div>;
   };
 });
@@ -44,7 +46,7 @@ describe('Home Page Component', () => {
     expect(layoutContainer).toBeInTheDocument();
   });
 
-  it('should render the RouteGeneratorClient component', () => {
+  it('should render the RunPlanner component', () => {
     render(<Home />);
 
     expect(screen.getByTestId('route-generator-client')).toBeInTheDocument();

@@ -1,5 +1,5 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { useGeolocation } from '@/app/hooks/useGeolocation';
+import { useGeolocation } from 'hooks/useGeolocation';
 
 describe('useGeolocation hook', () => {
   beforeEach(() => {
@@ -221,7 +221,7 @@ describe('useGeolocation hook', () => {
         timeout: 5000,
         maximumAge: 30000,
         enableHighAccuracy: true,
-      })
+      }),
     );
 
     act(() => {

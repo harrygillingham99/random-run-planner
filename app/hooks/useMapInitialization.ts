@@ -29,19 +29,20 @@ export const useMapInitialization = ({
     (result: { latitude: number; longitude: number }) => {
       onLocationFound?.(result.latitude, result.longitude);
     },
-    [onLocationFound]
+    [onLocationFound],
   );
 
   const handleLocationError = useCallback(
     (error: { message: string }) => {
       onLocationError?.(error.message);
     },
-    [onLocationError]
+    [onLocationError],
   );
 
   const { requestGeolocation } = useGeolocation(handleLocationFound, handleLocationError);
 
   // Initialize map only once
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     if (!mapContainer.current || mapRef.current) return;
 
@@ -76,6 +77,7 @@ export const useMapInitialization = ({
       mapRef.current = null;
     };
   }, []);
+  /* eslint-enable react-hooks/exhaustive-deps */
 
   return { mapContainer, mapRef };
 };

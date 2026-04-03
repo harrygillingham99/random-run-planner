@@ -11,14 +11,13 @@ const config: Config = {
   roots: ['<rootDir>'],
   testMatch: ['**/__tests__/**/*.ts?(x)', '**/?(*.)+(spec|test).ts?(x)'],
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/$1',
+    '^components/(.*)$': '<rootDir>/app/components/$1',
+    '^hooks/(.*)$': '<rootDir>/app/hooks/$1',
+    '^context/(.*)$': '<rootDir>/app/context/$1',
+    '^lib/(.*)$': '<rootDir>/app/lib/$1',
   },
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
-  collectCoverageFrom: [
-    'app/**/*.{js,jsx,ts,tsx}',
-    '!app/**/*.d.ts',
-    '!app/**/layout.tsx',
-  ],
+  collectCoverageFrom: ['app/**/*.{js,jsx,ts,tsx}', '!app/**/*.d.ts', '!app/**/layout.tsx'],
 };
 
 export default createJestConfig(config);

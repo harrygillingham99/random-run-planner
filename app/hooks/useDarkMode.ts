@@ -1,10 +1,22 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
 
 export const useDarkMode = () => {
-  const [isDark, setIsDark] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const [isDark, setIsDark] = useState(() => {
+    if (typeof window === 'undefined') {
+      return false;
+    }
+
+    const saved = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return saved === 'dark' || (!saved && prefersDark);
+  });
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
   const applyTheme = useCallback((dark: boolean) => {
     if (dark) {
@@ -18,23 +30,12 @@ export const useDarkMode = () => {
   }, []);
 
   useEffect(() => {
-    setMounted(true);
-
-    const saved = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const shouldBeDark = saved === 'dark' || (!saved && prefersDark);
-
-    setIsDark(shouldBeDark);
-    applyTheme(shouldBeDark);
-  }, [applyTheme]);
+    applyTheme(isDark);
+  }, [applyTheme, isDark]);
 
   const toggleTheme = useCallback(() => {
-    setIsDark((previous) => {
-      const next = !previous;
-      applyTheme(next);
-      return next;
-    });
-  }, [applyTheme]);
+    setIsDark((previous) => !previous);
+  }, []);
 
   return {
     isDark,

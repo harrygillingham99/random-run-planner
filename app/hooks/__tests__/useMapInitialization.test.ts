@@ -1,19 +1,18 @@
 import { renderHook } from '@testing-library/react';
-import { useMapInitialization } from '@/app/hooks/useMapInitialization';
-import React from 'react';
+import { useMapInitialization } from 'hooks/useMapInitialization';
 
 // Mock Leaflet
 jest.mock('leaflet', (): Record<string, unknown> => {
   return {
     map: jest.fn(() => ({
       setView: jest.fn(),
-      on: jest.fn(function (this: any) { return this; }),
-      removeLayer: jest.fn(function (this: any) { return this; }),
-      addLayer: jest.fn(function (this: any) { return this; }),
-      fitBounds: jest.fn(function (this: any) { return this; }),
+      on: jest.fn().mockReturnThis(),
+      removeLayer: jest.fn().mockReturnThis(),
+      addLayer: jest.fn().mockReturnThis(),
+      fitBounds: jest.fn().mockReturnThis(),
     })),
     tileLayer: jest.fn(() => ({
-      addTo: jest.fn(function (this: any) { return this; }),
+      addTo: jest.fn().mockReturnThis(),
     })),
   };
 });
@@ -53,16 +52,15 @@ describe('useMapInitialization', () => {
     // The hook should be properly initialized
     expect(result.current.mapContainer).toBeDefined();
     expect(result.current.mapRef).toBeDefined();
-    
+
     // In a real environment with a DOM container, geolocation would be requested once
     // This test just verifies the hook structure is correct
   });
 
   it('should initialize map only once', () => {
-    const { rerender } = renderHook(
-      (props) => useMapInitialization(props),
-      { initialProps: defaultProps }
-    );
+    const { rerender } = renderHook((props) => useMapInitialization(props), {
+      initialProps: defaultProps,
+    });
 
     // Map should initialize on first render
     expect(mockOnMapReady).toBeDefined();
@@ -110,7 +108,7 @@ describe('useMapInitialization', () => {
           ...defaultProps,
           initialLat: lat,
           initialLng: lng,
-        })
+        }),
       );
 
       expect(unmount).toBeDefined();
@@ -119,10 +117,9 @@ describe('useMapInitialization', () => {
   });
 
   it('should only initialize map once even with prop changes', async () => {
-    const { rerender } = renderHook(
-      (props) => useMapInitialization(props),
-      { initialProps: defaultProps }
-    );
+    const { rerender } = renderHook((props) => useMapInitialization(props), {
+      initialProps: defaultProps,
+    });
 
     // Change some props - the map should not reinitialize
     rerender({

@@ -1,10 +1,12 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import Map from '@/app/components/Map';
+import { render, waitFor } from '@testing-library/react';
+import Map from 'components/Map';
+import { RunPlannerContext } from 'context/RunPlannerContext';
+import type { RunPlannerContextValue } from 'context/RunPlannerContext';
+import { useGeolocation } from 'hooks/useGeolocation';
 
 // Mock useGeolocation hook
-jest.mock('@/app/hooks/useGeolocation', () => ({
+jest.mock('hooks/useGeolocation', () => ({
   useGeolocation: jest.fn(() => ({
     data: null,
     error: null,
@@ -15,35 +17,72 @@ jest.mock('@/app/hooks/useGeolocation', () => ({
 
 // Mock Leaflet with proper mock implementation
 jest.mock('leaflet', (): Record<string, unknown> => {
-  const mockMap: Record<string, jest.Mock> & { setView: jest.Mock; on: jest.Mock; removeLayer: jest.Mock; addLayer: jest.Mock; fitBounds: jest.Mock } = {
-    setView: jest.fn(function (this: typeof mockMap): typeof mockMap { return this; }),
-    on: jest.fn(function (this: typeof mockMap): typeof mockMap { return this; }),
-    removeLayer: jest.fn(function (this: typeof mockMap): typeof mockMap { return this; }),
-    addLayer: jest.fn(function (this: typeof mockMap): typeof mockMap { return this; }),
-    fitBounds: jest.fn(function (this: typeof mockMap): typeof mockMap { return this; }),
+  const mockMap: Record<string, jest.Mock> & {
+    setView: jest.Mock;
+    on: jest.Mock;
+    removeLayer: jest.Mock;
+    addLayer: jest.Mock;
+    fitBounds: jest.Mock;
+  } = {
+    setView: jest.fn(function (this: typeof mockMap): typeof mockMap {
+      return this;
+    }),
+    on: jest.fn(function (this: typeof mockMap): typeof mockMap {
+      return this;
+    }),
+    removeLayer: jest.fn(function (this: typeof mockMap): typeof mockMap {
+      return this;
+    }),
+    addLayer: jest.fn(function (this: typeof mockMap): typeof mockMap {
+      return this;
+    }),
+    fitBounds: jest.fn(function (this: typeof mockMap): typeof mockMap {
+      return this;
+    }),
   };
 
   const mockTileLayer: Record<string, jest.Mock> & { addTo: jest.Mock } = {
-    addTo: jest.fn(function (this: typeof mockTileLayer): typeof mockTileLayer { return this; }),
+    addTo: jest.fn(function (this: typeof mockTileLayer): typeof mockTileLayer {
+      return this;
+    }),
   };
 
   const mockCircleMarker: Record<string, jest.Mock> & { addTo: jest.Mock; bindPopup: jest.Mock } = {
-    addTo: jest.fn(function (this: typeof mockCircleMarker): typeof mockCircleMarker { return this; }),
-    bindPopup: jest.fn(function (this: typeof mockCircleMarker): typeof mockCircleMarker { return this; }),
+    addTo: jest.fn(function (this: typeof mockCircleMarker): typeof mockCircleMarker {
+      return this;
+    }),
+    bindPopup: jest.fn(function (this: typeof mockCircleMarker): typeof mockCircleMarker {
+      return this;
+    }),
   };
 
   const mockLayerGroup: Record<string, jest.Mock> & { addTo: jest.Mock; addLayer: jest.Mock } = {
-    addTo: jest.fn(function (this: typeof mockLayerGroup): typeof mockLayerGroup { return this; }),
-    addLayer: jest.fn(function (this: typeof mockLayerGroup): typeof mockLayerGroup { return this; }),
+    addTo: jest.fn(function (this: typeof mockLayerGroup): typeof mockLayerGroup {
+      return this;
+    }),
+    addLayer: jest.fn(function (this: typeof mockLayerGroup): typeof mockLayerGroup {
+      return this;
+    }),
   };
 
   const mockPolyline: Record<string, jest.Mock> & { addTo: jest.Mock; getBounds: jest.Mock } = {
-    addTo: jest.fn(function (this: typeof mockPolyline): typeof mockPolyline { return this; }),
-    getBounds: jest.fn((): Array<Array<[number, number]>> => [[[50, -1], [50.1, -1.1]]]),
+    addTo: jest.fn(function (this: typeof mockPolyline): typeof mockPolyline {
+      return this;
+    }),
+    getBounds: jest.fn(
+      (): Array<Array<[number, number]>> => [
+        [
+          [50, -1],
+          [50.1, -1.1],
+        ],
+      ],
+    ),
   };
 
   const mockMarker: Record<string, jest.Mock> & { addTo: jest.Mock } = {
-    addTo: jest.fn(function (this: typeof mockMarker): typeof mockMarker { return this; }),
+    addTo: jest.fn(function (this: typeof mockMarker): typeof mockMarker {
+      return this;
+    }),
   };
 
   return {
@@ -58,27 +97,49 @@ jest.mock('leaflet', (): Record<string, unknown> => {
 
 describe('Map Component', () => {
   const mockOnMapClick = jest.fn();
-  const defaultProps = {
+  const defaultContext: RunPlannerContextValue = {
     lat: 50.9097,
     lng: -1.4044,
+    distance: 5,
+    style: 'loop',
+    hasValidCoordinates: true,
+    onLatChange: jest.fn(),
+    onLngChange: jest.fn(),
+    onDistanceChange: jest.fn(),
+    onStyleChange: jest.fn(),
+    onGeoLocation: jest.fn(),
+    status: { message: '', type: '' },
+    routeData: { route: null, waypoints: null },
+    stats: { distance: '—', time: '—', pace: '—', waypoints: 0 },
+    isGenerating: false,
+    sidebarOpen: false,
+    setSidebarOpen: jest.fn(),
+    onGenerateRoute: jest.fn(),
     onMapClick: mockOnMapClick,
-    route: null,
-    waypoints: null,
+    onLocationFound: jest.fn(),
+    onLocationError: jest.fn(),
   };
+
+  const renderMap = (overrides: Partial<RunPlannerContextValue> = {}) =>
+    render(
+      <RunPlannerContext.Provider value={{ ...defaultContext, ...overrides }}>
+        <Map />
+      </RunPlannerContext.Provider>,
+    );
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it('should render map container', () => {
-    render(<Map {...defaultProps} />);
+    renderMap();
     // Component renders without crashing
     expect(mockOnMapClick).toBeDefined();
   });
 
   it('should handle map initialization', async () => {
-    const { container } = render(<Map {...defaultProps} />);
-    
+    const { container } = renderMap();
+
     await waitFor(() => {
       // Map container should be present
       const mapElement = container.querySelector('[style*="position"]');
@@ -87,28 +148,22 @@ describe('Map Component', () => {
   });
 
   it('should pass correct initial coordinates', () => {
-    const testLat = 51.5074;
-    const testLng = -0.1278;
-    
-    render(<Map lat={testLat} lng={testLng} onMapClick={mockOnMapClick} route={null} waypoints={null} />);
-    
+    renderMap({ lat: 51.5074, lng: -0.1278 });
+
     expect(mockOnMapClick).toBeDefined();
   });
 
-  it('should accept route and waypoints props', () => {
-    const route: [number, number][] = [[50, -1], [50.1, -1.1]];
-    const waypoints: [number, number][] = [[50, -1]];
-    
-    render(
-      <Map 
-        lat={50} 
-        lng={-1} 
-        onMapClick={mockOnMapClick} 
-        route={route} 
-        waypoints={waypoints}
-      />
-    );
-    
+  it('should accept route and waypoints in context', () => {
+    renderMap({
+      routeData: {
+        route: [
+          [50, -1],
+          [50.1, -1.1],
+        ],
+        waypoints: [[50, -1]],
+      },
+    });
+
     expect(mockOnMapClick).toBeDefined();
   });
 
@@ -121,36 +176,24 @@ describe('Map Component', () => {
     ];
 
     testCases.forEach(({ lat, lng }) => {
-      const { unmount } = render(
-        <Map lat={lat} lng={lng} onMapClick={mockOnMapClick} route={null} waypoints={null} />
-      );
+      const { unmount } = renderMap({ lat, lng });
       expect(mockOnMapClick).toBeDefined();
       unmount();
     });
   });
 
   it('should call onLocationFound when geolocation is successful', async () => {
-    const { useGeolocation } = require('@/app/hooks/useGeolocation');
     const mockOnLocationFound = jest.fn();
     const mockRequestGeolocation = jest.fn();
 
-    useGeolocation.mockImplementation((onSuccess: any) => ({
+    (useGeolocation as jest.Mock).mockImplementation(() => ({
       data: null,
       error: null,
       isLoading: false,
       requestGeolocation: mockRequestGeolocation,
     }));
 
-    render(
-      <Map
-        lat={50.9097}
-        lng={-1.4044}
-        onMapClick={mockOnMapClick}
-        onLocationFound={mockOnLocationFound}
-        route={null}
-        waypoints={null}
-      />
-    );
+    renderMap({ onLocationFound: mockOnLocationFound });
 
     await waitFor(() => {
       expect(mockRequestGeolocation).toHaveBeenCalled();
@@ -158,33 +201,27 @@ describe('Map Component', () => {
   });
 
   it('should call onLocationError when geolocation fails', async () => {
-    const { useGeolocation } = require('@/app/hooks/useGeolocation');
     const mockOnLocationError = jest.fn();
     const mockRequestGeolocation = jest.fn();
 
-    useGeolocation.mockImplementation((onSuccess: any, onError: any) => {
-      // Simulate calling the error callback
-      setTimeout(() => {
-        onError && onError({ message: 'Permission denied' });
-      }, 0);
-      return {
-        data: null,
-        error: null,
-        isLoading: false,
-        requestGeolocation: mockRequestGeolocation,
-      };
-    });
-
-    render(
-      <Map
-        lat={50.9097}
-        lng={-1.4044}
-        onMapClick={mockOnMapClick}
-        onLocationError={mockOnLocationError}
-        route={null}
-        waypoints={null}
-      />
+    (useGeolocation as jest.Mock).mockImplementation(
+      (_: unknown, onError: ((error: { message: string }) => void) | undefined) => {
+        // Simulate calling the error callback
+        setTimeout(() => {
+          if (onError) {
+            onError({ message: 'Permission denied' });
+          }
+        }, 0);
+        return {
+          data: null,
+          error: null,
+          isLoading: false,
+          requestGeolocation: mockRequestGeolocation,
+        };
+      },
     );
+
+    renderMap({ onLocationError: mockOnLocationError });
 
     await waitFor(() => {
       expect(mockRequestGeolocation).toHaveBeenCalled();
@@ -192,40 +229,32 @@ describe('Map Component', () => {
   });
 
   it('should preserve existing functionality with location callbacks', () => {
-    const mockOnLocationFound = jest.fn();
-    const mockOnLocationError = jest.fn();
-    const route: [number, number][] = [[50, -1], [50.1, -1.1]];
-    const waypoints: [number, number][] = [[50, -1]];
-
-    render(
-      <Map
-        lat={50}
-        lng={-1}
-        onMapClick={mockOnMapClick}
-        onLocationFound={mockOnLocationFound}
-        onLocationError={mockOnLocationError}
-        route={route}
-        waypoints={waypoints}
-      />
-    );
+    renderMap({
+      routeData: {
+        route: [
+          [50, -1],
+          [50.1, -1.1],
+        ],
+        waypoints: [[50, -1]],
+      },
+      onLocationFound: jest.fn(),
+      onLocationError: jest.fn(),
+    });
 
     expect(mockOnMapClick).toBeDefined();
     // Verify component renders without errors
   });
 
   it('should work without location callbacks (backward compatible)', () => {
-    const route: [number, number][] = [[50, -1], [50.1, -1.1]];
-    const waypoints: [number, number][] = [[50, -1]];
-
-    render(
-      <Map
-        lat={50}
-        lng={-1}
-        onMapClick={mockOnMapClick}
-        route={route}
-        waypoints={waypoints}
-      />
-    );
+    renderMap({
+      routeData: {
+        route: [
+          [50, -1],
+          [50.1, -1.1],
+        ],
+        waypoints: [[50, -1]],
+      },
+    });
 
     expect(mockOnMapClick).toBeDefined();
   });

@@ -1,5 +1,5 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
-import { useDarkMode } from '@/app/hooks/useDarkMode';
+import { useDarkMode } from 'hooks/useDarkMode';
 
 describe('useDarkMode hook', () => {
   beforeEach(() => {

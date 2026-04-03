@@ -16,14 +16,20 @@ interface UseGeolocationOptions {
   enableHighAccuracy?: boolean;
 }
 
+interface GeolocationState {
+  isLoading: boolean;
+  data: GeolocationResult | null;
+  error: GeolocationError | null;
+}
+
+const INITIAL_STATE: GeolocationState = { isLoading: false, data: null, error: null };
+
 export const useGeolocation = (
   onSuccess?: (result: GeolocationResult) => void,
   onError?: (error: GeolocationError) => void,
-  options: UseGeolocationOptions = {}
+  options: UseGeolocationOptions = {},
 ) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [data, setData] = useState<GeolocationResult | null>(null);
-  const [error, setError] = useState<GeolocationError | null>(null);
+  const [state, setState] = useState<GeolocationState>(INITIAL_STATE);
 
   const requestGeolocation = useCallback(() => {
     if (!navigator.geolocation) {
@@ -31,13 +37,12 @@ export const useGeolocation = (
         code: 0,
         message: 'Geolocation is not supported by this browser',
       };
-      setError(notSupportedError);
+      setState({ isLoading: false, data: null, error: notSupportedError });
       onError?.(notSupportedError);
       return;
     }
 
-    setIsLoading(true);
-    setError(null);
+    setState({ isLoading: true, data: null, error: null });
 
     const timeoutMs = options.timeout ?? 8000;
     const maximumAge = options.maximumAge ?? 60000;
@@ -49,8 +54,7 @@ export const useGeolocation = (
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
         };
-        setData(result);
-        setIsLoading(false);
+        setState({ isLoading: false, data: result, error: null });
         onSuccess?.(result);
       },
       (err) => {
@@ -63,22 +67,21 @@ export const useGeolocation = (
           code: err.code,
           message: errorMessageMap[err.code] || 'Unknown geolocation error',
         };
-        setError(errorObj);
-        setIsLoading(false);
+        setState({ isLoading: false, data: null, error: errorObj });
         onError?.(errorObj);
       },
       {
         timeout: timeoutMs,
         maximumAge,
         enableHighAccuracy,
-      }
+      },
     );
   }, [onSuccess, onError, options.timeout, options.maximumAge, options.enableHighAccuracy]);
 
   return {
-    data,
-    error,
-    isLoading,
+    data: state.data,
+    error: state.error,
+    isLoading: state.isLoading,
     requestGeolocation,
   };
 };

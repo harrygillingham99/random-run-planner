@@ -42,11 +42,15 @@ body {
 }
 
 body {
-  font-family: #{font(sans)}, sans-serif;
+  font-family:
+    #{font(sans)},
+    sans-serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
