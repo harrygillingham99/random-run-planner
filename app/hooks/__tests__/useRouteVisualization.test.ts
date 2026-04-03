@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react';
+import { renderHook, waitFor } from '@testing-library/react';
 import { useRouteVisualization } from 'hooks/useRouteVisualization';
 import type React from 'react';
 import * as Leaflet from 'leaflet';
@@ -88,7 +88,7 @@ describe('useRouteVisualization', () => {
     expect(L.layerGroup).not.toHaveBeenCalled();
   });
 
-  it('should create layer group and add to map', () => {
+  it('should create layer group and add to map', async () => {
     const route: [number, number][] = [
       [50, -1],
       [50.1, -1.1],
@@ -102,12 +102,12 @@ describe('useRouteVisualization', () => {
       }),
     );
 
-    expect(L.layerGroup).toHaveBeenCalled();
+    await waitFor(() => expect(L.layerGroup).toHaveBeenCalled());
     const mockLayer = L.layerGroup.mock.results[0].value;
     expect(mockLayer.addTo).toHaveBeenCalledWith(mockMapRef.current);
   });
 
-  it('should create polyline with correct properties', () => {
+  it('should create polyline with correct properties', async () => {
     const route: [number, number][] = [
       [50, -1],
       [50.1, -1.1],
@@ -121,17 +121,19 @@ describe('useRouteVisualization', () => {
       }),
     );
 
-    expect(L.polyline).toHaveBeenCalledWith(
-      route,
-      expect.objectContaining({
-        color: '#1D9E75',
-        weight: 5,
-        opacity: 0.9,
-      }),
-    );
+    await waitFor(() => {
+      expect(L.polyline).toHaveBeenCalledWith(
+        route,
+        expect.objectContaining({
+          color: '#1D9E75',
+          weight: 5,
+          opacity: 0.9,
+        }),
+      );
+    });
   });
 
-  it('should add polyline to layer group', () => {
+  it('should add polyline to layer group', async () => {
     const route: [number, number][] = [
       [50, -1],
       [50.1, -1.1],
@@ -145,11 +147,12 @@ describe('useRouteVisualization', () => {
       }),
     );
 
+    await waitFor(() => expect(L.polyline).toHaveBeenCalled());
     const mockPolyline = L.polyline.mock.results[0].value;
     expect(mockPolyline.addTo).toHaveBeenCalled();
   });
 
-  it('should create waypoint markers', () => {
+  it('should create waypoint markers', async () => {
     const route: [number, number][] = [
       [50, -1],
       [50.1, -1.1],
@@ -167,10 +170,10 @@ describe('useRouteVisualization', () => {
       }),
     );
 
-    expect(L.circleMarker).toHaveBeenCalledTimes(waypoints.length);
+    await waitFor(() => expect(L.circleMarker).toHaveBeenCalledTimes(waypoints.length));
   });
 
-  it('should create waypoint markers with correct properties', () => {
+  it('should create waypoint markers with correct properties', async () => {
     const route: [number, number][] = [
       [50, -1],
       [50.1, -1.1],
@@ -185,19 +188,21 @@ describe('useRouteVisualization', () => {
       }),
     );
 
-    expect(L.circleMarker).toHaveBeenCalledWith(
-      [50.05, -1.05],
-      expect.objectContaining({
-        radius: 6,
-        fillColor: '#378ADD',
-        color: '#fff',
-        weight: 2,
-        fillOpacity: 1,
-      }),
-    );
+    await waitFor(() => {
+      expect(L.circleMarker).toHaveBeenCalledWith(
+        [50.05, -1.05],
+        expect.objectContaining({
+          radius: 6,
+          fillColor: '#378ADD',
+          color: '#fff',
+          weight: 2,
+          fillOpacity: 1,
+        }),
+      );
+    });
   });
 
-  it('should bind popup to waypoint markers', () => {
+  it('should bind popup to waypoint markers', async () => {
     const route: [number, number][] = [
       [50, -1],
       [50.1, -1.1],
@@ -212,11 +217,12 @@ describe('useRouteVisualization', () => {
       }),
     );
 
+    await waitFor(() => expect(L.circleMarker).toHaveBeenCalled());
     const mockMarker = L.circleMarker.mock.results[0].value;
     expect(mockMarker.bindPopup).toHaveBeenCalledWith('Waypoint 1');
   });
 
-  it('should fit map bounds to route', () => {
+  it('should fit map bounds to route', async () => {
     const route: [number, number][] = [
       [50, -1],
       [50.1, -1.1],
@@ -230,18 +236,20 @@ describe('useRouteVisualization', () => {
       }),
     );
 
-    expect(mockMapRef.current.fitBounds).toHaveBeenCalledWith(
-      [
+    await waitFor(() => {
+      expect(mockMapRef.current.fitBounds).toHaveBeenCalledWith(
         [
-          [50, -1],
-          [50.1, -1.1],
+          [
+            [50, -1],
+            [50.1, -1.1],
+          ],
         ],
-      ],
-      { padding: [40, 40] },
-    );
+        { padding: [40, 40] },
+      );
+    });
   });
 
-  it('should remove previous route when route prop changes', () => {
+  it('should remove previous route when route prop changes', async () => {
     const route1: [number, number][] = [
       [50, -1],
       [50.1, -1.1],
@@ -261,15 +269,15 @@ describe('useRouteVisualization', () => {
       { initialProps: { route: route1 } },
     );
 
-    expect(L.layerGroup).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(L.layerGroup).toHaveBeenCalledTimes(1));
 
     rerender({ route: route2 });
 
-    expect(mockMapRef.current.removeLayer).toHaveBeenCalled();
-    expect(L.layerGroup).toHaveBeenCalledTimes(2);
+    await waitFor(() => expect(mockMapRef.current.removeLayer).toHaveBeenCalled());
+    await waitFor(() => expect(L.layerGroup).toHaveBeenCalledTimes(2));
   });
 
-  it('should clear route layer when route is removed', () => {
+  it('should clear route layer when route is removed', async () => {
     const route: [number, number][] = [
       [50, -1],
       [50.1, -1.1],
@@ -285,8 +293,10 @@ describe('useRouteVisualization', () => {
       { initialProps: { route } },
     );
 
+    await waitFor(() => expect(L.layerGroup).toHaveBeenCalledTimes(1));
+
     rerender({ route: null });
 
-    expect(mockMapRef.current.removeLayer).toHaveBeenCalled();
+    await waitFor(() => expect(mockMapRef.current.removeLayer).toHaveBeenCalled());
   });
 });

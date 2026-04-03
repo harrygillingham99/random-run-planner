@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import FloatingStats from 'components/FloatingStats';
 import { RunPlannerContext } from 'context/RunPlannerContext';
 import type { RunPlannerContextValue } from 'context/RunPlannerContext';
+import styles from '../../styles/FloatingStats.module.scss';
 
 describe('FloatingStats Component', () => {
   const defaultContext: RunPlannerContextValue = {
@@ -76,10 +77,10 @@ describe('FloatingStats Component', () => {
       stats: { distance: '5.00 km', time: '30 min', pace: '6:00/km', waypoints: 0 },
     });
 
-    const floatingStats = container.querySelector('.floating-stats');
+    const floatingStats = container.querySelector(`.${styles.floatingStats}`);
     expect(floatingStats).toBeInTheDocument();
 
-    const floatStats = container.querySelectorAll('.float-stat');
+    const floatStats = container.querySelectorAll(`.${styles.floatStat}`);
     expect(floatStats).toHaveLength(2); // Distance and time
   });
 
@@ -88,10 +89,10 @@ describe('FloatingStats Component', () => {
       stats: { distance: '5.00 km', time: '30 min', pace: '6:00/km', waypoints: 0 },
     });
 
-    const floatStatLabels = container.querySelectorAll('.float-stat-label');
+    const floatStatLabels = container.querySelectorAll(`.${styles.floatStatLabel}`);
     expect(floatStatLabels[0]).toHaveTextContent('Distance');
 
-    const floatStatValues = container.querySelectorAll('.float-stat-value');
+    const floatStatValues = container.querySelectorAll(`.${styles.floatStatValue}`);
     expect(floatStatValues[0]).toHaveTextContent('5.00 km');
   });
 
@@ -100,17 +101,19 @@ describe('FloatingStats Component', () => {
       stats: { distance: '5.00 km', time: '30 min', pace: '6:00/km', waypoints: 0 },
     });
 
-    const floatStatLabels = container.querySelectorAll('.float-stat-label');
+    const floatStatLabels = container.querySelectorAll(`.${styles.floatStatLabel}`);
     expect(floatStatLabels[1]).toHaveTextContent('Est. time');
 
-    const floatStatValues = container.querySelectorAll('.float-stat-value');
+    const floatStatValues = container.querySelectorAll(`.${styles.floatStatValue}`);
     expect(floatStatValues[1]).toHaveTextContent('30 min');
   });
 
   it('should handle empty string values', () => {
-    renderFloatingStats({ stats: { distance: '', time: '', pace: '', waypoints: 0 } });
+    const { container } = renderFloatingStats({
+      stats: { distance: '', time: '', pace: '', waypoints: 0 },
+    });
 
-    const floatingStats = screen.getByText('Distance').closest('.floating-stats');
+    const floatingStats = container.querySelector(`.${styles.floatingStats}`);
     expect(floatingStats).toBeInTheDocument();
   });
 
