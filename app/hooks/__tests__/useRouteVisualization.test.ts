@@ -37,10 +37,7 @@ describe('useRouteVisualization', () => {
     polyline: jest.Mock;
     circleMarker: jest.Mock;
   };
-  let mockMapRef: React.MutableRefObject<{
-    removeLayer: jest.Mock;
-    fitBounds: jest.Mock;
-  }>;
+  let mockMapRef: React.MutableRefObject<L.Map | null>;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -49,7 +46,7 @@ describe('useRouteVisualization', () => {
         removeLayer: jest.fn(),
         fitBounds: jest.fn(),
       },
-    };
+    } as unknown as React.MutableRefObject<L.Map | null>;
   });
 
   it('should return routeLayerRef', () => {
@@ -237,7 +234,7 @@ describe('useRouteVisualization', () => {
     );
 
     await waitFor(() => {
-      expect(mockMapRef.current.fitBounds).toHaveBeenCalledWith(
+      expect(mockMapRef.current!.fitBounds).toHaveBeenCalledWith(
         [
           [
             [50, -1],
@@ -273,7 +270,7 @@ describe('useRouteVisualization', () => {
 
     rerender({ route: route2 });
 
-    await waitFor(() => expect(mockMapRef.current.removeLayer).toHaveBeenCalled());
+    await waitFor(() => expect(mockMapRef.current!.removeLayer).toHaveBeenCalled());
     await waitFor(() => expect(L.layerGroup).toHaveBeenCalledTimes(2));
   });
 
@@ -290,13 +287,13 @@ describe('useRouteVisualization', () => {
           route: routeProp,
           waypoints: null,
         }),
-      { initialProps: { route } },
+      { initialProps: { route } as { route: [number, number][] | null } },
     );
 
     await waitFor(() => expect(L.layerGroup).toHaveBeenCalledTimes(1));
 
     rerender({ route: null });
 
-    await waitFor(() => expect(mockMapRef.current.removeLayer).toHaveBeenCalled());
+    await waitFor(() => expect(mockMapRef.current!.removeLayer).toHaveBeenCalled());
   });
 });

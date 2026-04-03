@@ -17,10 +17,7 @@ jest.mock('leaflet', (): Record<string, unknown> => {
 
 describe('useStartMarker', () => {
   const L = Leaflet as unknown as { circleMarker: jest.Mock };
-  let mockMapRef: React.MutableRefObject<{
-    removeLayer: jest.Mock;
-    setView: jest.Mock;
-  }>;
+  let mockMapRef: React.MutableRefObject<L.Map | null>;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -29,7 +26,7 @@ describe('useStartMarker', () => {
         removeLayer: jest.fn(),
         setView: jest.fn(),
       },
-    };
+    } as unknown as React.MutableRefObject<L.Map | null>;
   });
 
   it('should return startMarkerRef', () => {
@@ -72,7 +69,7 @@ describe('useStartMarker', () => {
   it('should center map on marker', () => {
     renderHook(() => useStartMarker({ mapRef: mockMapRef, lat: 50.9097, lng: -1.4044 }));
 
-    expect(mockMapRef.current.setView).toHaveBeenCalledWith([50.9097, -1.4044], 14);
+    expect(mockMapRef.current!.setView).toHaveBeenCalledWith([50.9097, -1.4044], 14);
   });
 
   it('should remove previous marker when coordinates change', () => {
@@ -85,7 +82,7 @@ describe('useStartMarker', () => {
 
     rerender({ lat: 51.5074, lng: -0.1278 });
 
-    expect(mockMapRef.current.removeLayer).toHaveBeenCalledWith(firstMarker);
+    expect(mockMapRef.current!.removeLayer).toHaveBeenCalledWith(firstMarker);
   });
 
   it('should update marker position when coordinates change', () => {
