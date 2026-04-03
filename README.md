@@ -20,3 +20,7 @@ https://project-osrm.org/
 Route and map data are from **OpenStreetMap** contributors and are licensed under the **Open Database License (ODbL)**:  
 https://www.openstreetmap.org/copyright  
 https://opendatacommons.org/licenses/odbl/
+
+## Contributors
+@me
+@JonathanGourlay
