@@ -22,5 +22,5 @@ https://www.openstreetmap.org/copyright
 https://opendatacommons.org/licenses/odbl/
 
 ## Contributors
-@me
-@JonathanGourlay
+- @me
+- @JonathanGourlay
