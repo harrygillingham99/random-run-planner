@@ -1,10 +1,10 @@
 'use client';
 
-import { useMapInitialization } from '../hooks/useMapInitialization';
-import { useStartMarker } from '../hooks/useStartMarker';
-import { useRouteVisualization } from '../hooks/useRouteVisualization';
-import { useMapHint } from '../hooks/useMapHint';
-import { useRunPlanner } from '../context/RunPlannerContext';
+import { useMapInitialization } from 'hooks/useMapInitialization';
+import { useStartMarker } from 'hooks/useStartMarker';
+import { useRouteVisualization } from 'hooks/useRouteVisualization';
+import { useMapHint } from 'hooks/useMapHint';
+import { useRunPlanner } from 'context/RunPlannerContext';
 import styles from 'styles/Map.module.scss';
 
 export default function Map() {

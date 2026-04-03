@@ -1,7 +1,6 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import Navbar from 'components/Navbar';
-import styles from '../../styles/Navbar.module.scss';
+import styles from 'styles/Navbar.module.scss';
 
 jest.mock('components/DarkModeToggle', () => {
   return function MockDarkModeToggle() {

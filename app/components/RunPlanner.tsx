@@ -1,8 +1,8 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useRunPlannerState } from '../hooks/useRunPlannerState';
-import { RunPlannerContext } from '../context/RunPlannerContext';
+import { useRunPlannerState } from 'hooks/useRunPlannerState';
+import { RunPlannerContext } from 'context/RunPlannerContext';
 import Sidebar from './Sidebar';
 import FloatingStats from './FloatingStats';
 import styles from 'styles/RunPlanner.module.scss';

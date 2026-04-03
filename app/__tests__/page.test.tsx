@@ -42,7 +42,7 @@ describe('Home Page Component', () => {
   it('should render the layout container', () => {
     render(<Home />);
 
-    const layoutContainer = document.querySelector('.layout');
+    const layoutContainer = document.querySelector('.wrapper');
     expect(layoutContainer).toBeInTheDocument();
   });
 
@@ -55,7 +55,7 @@ describe('Home Page Component', () => {
   it('should have proper structure', () => {
     const { container } = render(<Home />);
 
-    const layout = container.querySelector('.layout');
+    const layout = container.querySelector('.wrapper');
     expect(layout).toBeInTheDocument();
     expect(layout?.firstChild).toHaveAttribute('data-testid', 'route-generator-client');
   });

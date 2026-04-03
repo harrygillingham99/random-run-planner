@@ -1,6 +1,6 @@
 'use client';
 
-import { useRunPlanner } from '../context/RunPlannerContext';
+import { useRunPlanner } from 'context/RunPlannerContext';
 import styles from 'styles/FloatingStats.module.scss';
 
 export default function FloatingStats() {

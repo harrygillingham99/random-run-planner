@@ -1,6 +1,6 @@
 'use client';
 
-import { useDarkMode } from '../hooks/useDarkMode';
+import { useDarkMode } from 'hooks/useDarkMode';
 import styles from 'styles/DarkModeToggle.module.scss';
 
 export default function DarkModeToggle() {

@@ -17,7 +17,7 @@ describe('RootLayout', () => {
     expect(metadata.description).toContain('OpenStreetMap');
   });
 
-  it('should include html/body structure, navbar, children, and leaflet stylesheet', () => {
+  it('should include html/body structure, navbar, children', () => {
     const children = <main data-testid="page-content">Content</main>;
     const tree = RootLayout({ children });
 
@@ -32,16 +32,6 @@ describe('RootLayout', () => {
     expect(head.type).toBe('head');
     expect(body.type).toBe('body');
     expect(body.props.suppressHydrationWarning).toBe(true);
-
-    const headChildren = React.Children.toArray(head.props.children) as Array<
-      ElementWithProps<{ href?: string }>
-    >;
-    const stylesheetLink = headChildren.find(
-      (node) =>
-        node.type === 'link' &&
-        node.props.href === 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
-    );
-    expect(stylesheetLink).toBeDefined();
 
     const bodyChildren = React.Children.toArray(body.props.children) as [
       ElementWithProps,

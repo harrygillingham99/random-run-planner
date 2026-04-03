@@ -1,9 +1,8 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import FloatingStats from 'components/FloatingStats';
 import { RunPlannerContext } from 'context/RunPlannerContext';
 import type { RunPlannerContextValue } from 'context/RunPlannerContext';
-import styles from '../../styles/FloatingStats.module.scss';
+import styles from 'styles/FloatingStats.module.scss';
 
 describe('FloatingStats Component', () => {
   const defaultContext: RunPlannerContextValue = {

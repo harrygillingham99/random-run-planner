@@ -1,7 +1,7 @@
 'use client';
 
-import { useRunPlanner } from '../context/RunPlannerContext';
-import { useCoordinateInputs } from '../hooks/useCoordinateInputs';
+import { useRunPlanner } from 'context/RunPlannerContext';
+import { useCoordinateInputs } from 'hooks/useCoordinateInputs';
 import styles from 'styles/Sidebar.module.scss';
 
 export default function Sidebar() {

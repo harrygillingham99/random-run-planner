@@ -1,8 +1,8 @@
 import { useState, useCallback } from 'react';
-import { generateRoute, calculateStats } from '../lib/routeUtils';
+import { generateRoute, calculateStats } from 'lib/routeUtils';
 import { useGeolocation } from './useGeolocation';
 import { useRouteForm } from './useRouteForm';
-import type { RunPlannerContextValue, RouteStats } from '../context/RunPlannerContext';
+import type { RunPlannerContextValue, RouteStats } from 'context/RunPlannerContext';
 
 const START_POINT_SET_STATUS = {
   message: 'Start point set — click Generate run!',

@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, waitFor } from '@testing-library/react';
 import Map from 'components/Map';
 import { RunPlannerContext } from 'context/RunPlannerContext';
