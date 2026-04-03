@@ -19,7 +19,8 @@
     padding: space(sm) space(md);
     border: 1px solid var(--border);
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 16px;
+    touch-action: manipulation;
     font-family:
       #{font(mono)},
       monospace;

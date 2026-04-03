@@ -41,6 +41,13 @@ body {
   overflow: hidden;
 }
 
+input,
+select,
+textarea,
+button {
+  touch-action: manipulation;
+}
+
 body {
   font-family:
     #{font(sans)},
